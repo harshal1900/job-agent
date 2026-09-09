@@ -1,16 +1,50 @@
-.env
+# --- Secrets / environment ---
+# Broad pattern to catch any local variant (.env.local, .env.production, a
+# stray .env.bak, etc.), with the checked-in template explicitly allowed
+# back in.
+.env*
+!.env.example
+
+# --- Python ---
 venv/
 .venv/
 __pycache__/
 *.pyc
-*.db
-.DS_Store
-node_modules/
 .pytest_cache/
 *.egg-info/
 
-# Personal application artifacts — never commit resumes/cover letters/exports
+# --- Database (SQLite files + WAL/journal side-files) ---
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.sqlite3-journal
+
+# --- Playwright artifacts ---
+# Traces/videos/screenshots can capture live ATS pages (including any PII
+# already filled into a form) — never commit them.
+test-results/
+playwright-report/
+playwright/.cache/
+
+# --- ngrok ---
+# Local ngrok config can embed an authtoken; this repo shouldn't need one
+# checked in regardless of where the user's ngrok config file ends up.
+ngrok.yml
+.ngrok/
+
+# --- OS / editor ---
+.DS_Store
+node_modules/
+
+# --- Personal application artifacts — never commit resumes/cover letters/exports ---
 exports/*
 !exports/.gitkeep
 reports/*
 !reports/.gitkeep
+
+# --- Real profile data (name/email/phone/experience) — see README for the
+# schema to create this file locally; never commit the filled-in version ---
+config/master_profile.json

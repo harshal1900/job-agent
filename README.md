@@ -35,10 +35,96 @@ Generate a token secret:
 python -c "import secrets; print(secrets.token_urlsafe(32))"
 ```
 
-Fill in `config/master_profile.json` with your real experience — the
-resume rewriter can only draw from what's in there. Add one pilot company
-board to `config/target_boards.yaml` (Greenhouse only for now; Lever/Workday
-scrapers are stubs — see `scrapers/`).
+`config/master_profile.json` is **gitignored** (it holds your real name,
+contact info, and work history) — it won't exist yet on a fresh clone.
+Create it yourself with this structure, filled in with your real data; the
+resume rewriter can only draw from what's in here, so the more complete it
+is, the better the tailored drafts:
+
+```json
+{
+  "personal_info": {
+    "full_name": "",
+    "email": "",
+    "phone": "",
+    "location": "",
+    "linkedin": "",
+    "languages": []
+  },
+  "work_authorization": {
+    "status": "",
+    "authorized_countries": [],
+    "requires_sponsorship": false,
+    "notes": ""
+  },
+  "job_search_preferences": {
+    "target_titles": [],
+    "target_locations": [],
+    "remote_preference": "remote_or_hybrid",
+    "salary_floor_usd": 0,
+    "years_of_experience": 0,
+    "seniority_level": "",
+    "industries_of_interest": []
+  },
+  "professional_summary": "",
+  "core_ai_competencies": {
+    "llms_genai": [],
+    "rag_pipelines": [],
+    "agentic_ai": [],
+    "applied_ml": [],
+    "nlp": [],
+    "ai_augmented_dev": []
+  },
+  "technical_skills": {
+    "ai_ml_engineering": [],
+    "ai_augmented_development": [],
+    "enterprise_architecture": [],
+    "engineering_leadership": []
+  },
+  "ai_ml_projects": [
+    {
+      "name": "",
+      "program": "",
+      "status": "",
+      "description": "",
+      "skills_tools": []
+    }
+  ],
+  "professional_experience": [
+    {
+      "title": "",
+      "company": "",
+      "location": "",
+      "start_date": "",
+      "end_date": "",
+      "achievements": []
+    }
+  ],
+  "education": [
+    {
+      "program": "",
+      "institution": "",
+      "status": "",
+      "coverage": ""
+    }
+  ],
+  "certifications": [
+    {
+      "name": "",
+      "issuer": "",
+      "year": ""
+    }
+  ]
+}
+```
+
+The section names above aren't hardcoded anywhere — `llm/resume_rewriter.py`
+and `llm/match_scorer.py` just flatten every string value in this file into
+a fact vocabulary, so you can add/rename fields as long as you keep it
+valid JSON.
+
+Add one pilot company board to `config/target_boards.yaml` (Greenhouse only
+for now; Lever/Workday scrapers are stubs — see `scrapers/`).
 
 ## Running locally
 
