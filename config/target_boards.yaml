@@ -4,12 +4,45 @@
 #
 # ats: one of "greenhouse" | "lever" | "workday"
 boards:
-  - company: "example-co"
+  # Verified live 2026-09-09 — all reachable and returning real postings
+  # (or, for affinipay, a legitimate "no current openings" empty state).
+  - company: "affinipay"
     ats: greenhouse
-    url: "https://boards.greenhouse.io/example-co"
+    url: "https://boards.greenhouse.io/affinipay"
+    enabled: true
+
+  - company: "wheelhouse"
+    ats: greenhouse
+    url: "https://boards.greenhouse.io/wheelhouse"
+    enabled: true
+
+  - company: "fictiv"
+    ats: greenhouse
+    url: "https://boards.greenhouse.io/fictiv"
+    enabled: true
+
+  - company: "gitlab"
+    ats: greenhouse
+    url: "https://job-boards.greenhouse.io/gitlab"
+    enabled: true
+
+  - company: "discord"
+    ats: greenhouse
+    url: "https://boards.greenhouse.io/discord"
+    enabled: true
+
+  # NOT wired up: stripe and figma both redirect their Greenhouse board to a
+  # fully custom-branded careers page (stripe.com/careers/search,
+  # figma.com/careers) with different markup entirely — our
+  # greenhouse_scraper.py selectors don't apply, and it isn't a quick fix
+  # since it's not really "Greenhouse HTML" anymore. Leave disabled until a
+  # dedicated parser is written for each, if still wanted.
+  - company: "stripe"
+    ats: greenhouse
+    url: "https://boards.greenhouse.io/stripe"
     enabled: false
 
-  # - company: "another-co"
-  #   ats: lever
-  #   url: "https://jobs.lever.co/another-co"
-  #   enabled: false
+  - company: "figma"
+    ats: greenhouse
+    url: "https://job-boards.greenhouse.io/figma"
+    enabled: false
