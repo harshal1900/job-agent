@@ -4,14 +4,11 @@ from __future__ import annotations
 
 import json
 import logging
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 
 import yaml
 from apscheduler.schedulers.background import BackgroundScheduler
-from jinja2 import Environment, FileSystemLoader
 
+from api.emailer import send_match_email
 from api.security import issue_token
 from automation.status_checker import check_job_statuses
 from config.settings import BASE_DIR, get_settings
@@ -22,9 +19,6 @@ from llm.resume_rewriter import HallucinationError, ResumeRewriter
 from scrapers.greenhouse_scraper import GreenhouseScraper
 
 logger = logging.getLogger(__name__)
-
-TEMPLATES_DIR = BASE_DIR / "templates"
-_jinja_env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)))
 
 # Only ATSes with an implemented scraper participate in the scan cycle —
 # lever/workday raise NotImplementedError today (see scrapers/), so boards
@@ -43,24 +37,6 @@ def _load_target_boards() -> list[dict]:
     with open(BASE_DIR / "config" / "target_boards.yaml") as f:
         data = yaml.safe_load(f) or {}
     return [b for b in data.get("boards", []) if b.get("enabled")]
-
-
-def _send_email(subject: str, html_body: str) -> None:
-    settings = get_settings()
-    if not (settings.SMTP_USER and settings.SMTP_APP_PASSWORD and settings.EMAIL_TO):
-        logger.warning("Email not configured — skipping send: %s", subject)
-        return
-
-    message = MIMEMultipart("alternative")
-    message["Subject"] = subject
-    message["From"] = settings.EMAIL_FROM or settings.SMTP_USER
-    message["To"] = settings.EMAIL_TO
-    message.attach(MIMEText(html_body, "html"))
-
-    with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT) as server:
-        server.starttls()
-        server.login(settings.SMTP_USER, settings.SMTP_APP_PASSWORD)
-        server.send_message(message)
 
 
 def scan_job() -> None:
@@ -141,8 +117,7 @@ def scan_job() -> None:
                 approve_token = issue_token(session, application.id, TokenAction.APPROVE)
                 reject_token = issue_token(session, application.id, TokenAction.REJECT)
 
-                template = _jinja_env.get_template("email_match.html")
-                html = template.render(
+                send_match_email(
                     company=job.company,
                     title=job.title,
                     match_score=job.match_score,
@@ -152,7 +127,6 @@ def scan_job() -> None:
                     approve_url=f"{settings.PUBLIC_BASE_URL}/respond/{approve_token.raw_token}",
                     reject_url=f"{settings.PUBLIC_BASE_URL}/respond/{reject_token.raw_token}",
                 )
-                _send_email(f"New match: {job.title} @ {job.company}", html)
 
 
 def register_jobs(scheduler: BackgroundScheduler) -> None:

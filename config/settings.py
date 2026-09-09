@@ -10,7 +10,6 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,11 +43,8 @@ class Settings(BaseSettings):
     HF_API_TOKEN: str = ""
     HF_MODEL: str = ""
 
-    # --- Email ---
-    SMTP_HOST: str = "smtp.gmail.com"
-    SMTP_PORT: int = 587
-    SMTP_USER: str = ""
-    SMTP_APP_PASSWORD: str = ""
+    # --- Email (Resend API) ---
+    RESEND_API_KEY: str = ""
     EMAIL_FROM: str = ""
     EMAIL_TO: str = ""
 
