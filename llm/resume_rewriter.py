@@ -113,8 +113,14 @@ def _is_sentence_initial(text: str, start: int) -> bool:
     """True if the char at `start` opens the string or follows sentence-end
     punctuation. An ordinary word ("Operating", "Furthermore") is only
     capitalized because English capitalizes sentence starts, not because
-    it's a proper noun -- that capitalization carries no signal at all."""
-    prefix = text[:start].rstrip()
+    it's a proper noun -- that capitalization carries no signal at all.
+
+    Strips only spaces/tabs, NOT newlines: a bare .rstrip() would eat the
+    newline itself whenever a preceding bullet doesn't end in punctuation
+    (e.g. "one bullet\nAnother bullet"), silently losing the one signal
+    that the next line starts fresh.
+    """
+    prefix = text[:start].rstrip(" \t")
     return not prefix or prefix[-1] in ".!?\n"
 
 
