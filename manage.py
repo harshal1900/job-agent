@@ -5,6 +5,7 @@ Usage:
     python manage.py init-db
     python manage.py scan
     python manage.py retry-pending
+    python manage.py backfill-descriptions
     python manage.py check-status
     python manage.py run-application <application_id>
     python manage.py serve [--scan-now]
@@ -15,6 +16,14 @@ hitting an LLM rate limit or a malformed-response bug) — without
 re-scraping. `scan` only ever looks at brand-new postings; it silently
 skips any source_url already in the DB, success or failure, so it will
 NOT retry anything on its own.
+
+`backfill-descriptions` re-fetches real job-description text (via
+Playwright, respecting the same scraper etiquette as a normal scan) for any
+job whose description_raw is empty, resets it to NEW so `retry-pending`
+naturally re-scores/re-tails it with real content, and deletes any existing
+Application built from the empty-description fallback. One-time repair for
+a bug where description_raw was never actually populated by scan_job() —
+safe to re-run; it only touches jobs still missing real description text.
 
 `run-application` is a separate CLI step (not a FastAPI request handler) on
 purpose — see automation/playwright_runner.py: in manual mode it leaves a
@@ -65,6 +74,18 @@ def cmd_retry_pending(_args) -> None:
     print(
         f"Retry complete: {result['scored_now']} jobs newly scored, "
         f"{result['tailored_now']} jobs newly tailored + emailed."
+    )
+
+
+def cmd_backfill_descriptions(_args) -> None:
+    from database.db import init_db
+    from api.scheduler import backfill_descriptions
+
+    init_db()
+    result = backfill_descriptions()
+    print(
+        f"Backfill complete: {result['updated']} jobs updated with real "
+        f"description text (reset to NEW for re-scoring), {result['failed']} failed."
     )
 
 
@@ -177,6 +198,9 @@ def main() -> None:
     subparsers.add_parser("init-db").set_defaults(func=cmd_init_db)
     subparsers.add_parser("scan").set_defaults(func=cmd_scan)
     subparsers.add_parser("retry-pending").set_defaults(func=cmd_retry_pending)
+    subparsers.add_parser("backfill-descriptions").set_defaults(
+        func=cmd_backfill_descriptions
+    )
     subparsers.add_parser("check-status").set_defaults(func=cmd_check_status)
 
     run_app_parser = subparsers.add_parser("run-application")

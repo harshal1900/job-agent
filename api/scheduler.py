@@ -7,6 +7,7 @@ import logging
 
 import yaml
 from apscheduler.schedulers.background import BackgroundScheduler
+from playwright.sync_api import sync_playwright
 
 from api.emailer import send_match_email
 from api.security import issue_token
@@ -209,15 +210,21 @@ def retry_pending_jobs() -> dict:
         )
         for job in candidates:
             needs_score = _needs_scoring(job)
-            needs_tailor = _needs_tailoring(job, session, settings)
-            if not (needs_score or needs_tailor):
+            # _needs_tailoring() requires job.match_score >= threshold, which
+            # is unknowable before an unscored job is actually scored — so
+            # this pre-check alone would always read False for a job that
+            # gets scored AND tailored in the same pass below, undercounting
+            # tailored_now even though the tailor+email genuinely happened.
+            # Track "had an Application before" instead and diff after.
+            if not (needs_score or _needs_tailoring(job, session, settings)):
                 continue
+            had_application = _has_application(session, job)
 
             _score_and_tailor(session, job, profile, scorer, rewriter, settings)
 
             if needs_score and job.match_score is not None:
                 scored_now += 1
-            if needs_tailor and _has_application(session, job):
+            if not had_application and _has_application(session, job):
                 tailored_now += 1
 
     return {"scored_now": scored_now, "tailored_now": tailored_now}
@@ -228,6 +235,88 @@ def _has_application(session, job: Job) -> bool:
         session.query(Application).filter(Application.job_id == job.id).first()
         is not None
     )
+
+
+def backfill_descriptions() -> dict:
+    """One-time repair for a real bug: GreenhouseScraper.fetch_description()
+    was implemented but never called anywhere in the scan pipeline, so
+    description_raw has been empty for every job ever scraped — matching
+    and tailoring have only ever seen the bare job title, not real JD text.
+
+    Re-fetches real descriptions for every job still on the empty fallback,
+    resets each to NEW (clearing match_score/keyword_gaps) so
+    retry_pending_jobs() naturally re-scores/re-tailors it with real
+    content, and deletes any existing Application (cascading its approval
+    tokens) built from the wrong text — otherwise _needs_tailoring() would
+    see "already has an Application" and silently keep the stale, wrong
+    draft forever even after the job re-qualifies.
+    """
+    boards_by_company = {b["company"]: b for b in _load_target_boards()}
+    updated = 0
+    failed = 0
+
+    with session_scope() as session:
+        jobs = (
+            session.query(Job)
+            .filter((Job.description_raw == None) | (Job.description_raw == ""))  # noqa: E711
+            .all()
+        )
+        by_company: dict[str, list[Job]] = {}
+        for job in jobs:
+            by_company.setdefault(job.company, []).append(job)
+
+        for company, company_jobs in by_company.items():
+            board = boards_by_company.get(company)
+            ats = (
+                company_jobs[0].ats_type.value
+                if hasattr(company_jobs[0].ats_type, "value")
+                else company_jobs[0].ats_type
+            )
+            scraper_cls = _SCRAPERS.get(ats)
+            if scraper_cls is None or board is None:
+                logger.warning(
+                    "No scraper/board config for %s (%s) — skipping %d jobs",
+                    company,
+                    ats,
+                    len(company_jobs),
+                )
+                failed += len(company_jobs)
+                continue
+
+            scraper = scraper_cls(company=company, board_url=board["url"])
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                try:
+                    page = scraper.new_page(browser)
+                    for job in company_jobs:
+                        try:
+                            description = scraper.fetch_description(page, job.source_url)
+                        except Exception:
+                            logger.exception(
+                                "Failed to backfill description for %s", job.source_url
+                            )
+                            failed += 1
+                            continue
+
+                        job.description_raw = description
+                        job.match_score = None
+                        job.keyword_gaps = ""
+                        job.status = JobStatus.NEW
+
+                        existing_app = (
+                            session.query(Application)
+                            .filter(Application.job_id == job.id)
+                            .first()
+                        )
+                        if existing_app is not None:
+                            session.delete(existing_app)
+
+                        session.flush()
+                        updated += 1
+                finally:
+                    browser.close()
+
+    return {"updated": updated, "failed": failed}
 
 
 def register_jobs(scheduler: BackgroundScheduler) -> None:

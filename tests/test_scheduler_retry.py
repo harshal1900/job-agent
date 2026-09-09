@@ -108,6 +108,31 @@ def test_retry_scores_previously_unscored_job(monkeypatch, scheduler_env):
     assert scheduler_env["sent_emails"] == []
 
 
+def test_retry_counts_tailored_now_for_job_scored_and_tailored_in_same_pass(
+    monkeypatch, scheduler_env
+):
+    """Regression test for a real reporting bug: _needs_tailoring() requires
+    match_score >= threshold, which is unknowable for a job that starts
+    unscored -- so a job that gets scored above threshold AND tailored +
+    emailed in this same retry pass was silently missing from tailored_now
+    even though the email genuinely went out (confirmed against Resend logs
+    in production: 11 real emails sent, 'tailored_now' reported 0)."""
+    session = scheduler_env["session"]
+    job = _make_job(session, description="JOB_UNSCORED_BUT_QUALIFIES")
+
+    scorer = FakeScorer({"JOB_UNSCORED_BUT_QUALIFIES": (85, [])})
+    monkeypatch.setattr(scheduler_module, "MatchScorer", lambda: scorer)
+    monkeypatch.setattr(scheduler_module, "ResumeRewriter", lambda: FakeRewriter())
+
+    result = scheduler_module.retry_pending_jobs()
+
+    assert result["scored_now"] == 1
+    assert result["tailored_now"] == 1
+    apps = session.query(Application).filter(Application.job_id == job.id).all()
+    assert len(apps) == 1
+    assert len(scheduler_env["sent_emails"]) == 1
+
+
 def test_retry_tailors_scored_job_with_no_application(monkeypatch, scheduler_env):
     """Regression test for the exact real-world case: a job already scored
     above threshold (from a prior run) but whose tailoring step failed and
