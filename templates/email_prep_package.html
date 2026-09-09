@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Interview prep package</title>
+</head>
+<body style="font-family: -apple-system, Helvetica, Arial, sans-serif; color: #1a1a1a; max-width: 640px; margin: 0 auto; padding: 24px;">
+  <h2 style="margin-bottom: 4px;">Interview prep: {{ title }} @ {{ company }}</h2>
+
+  <h3>STAR questions</h3>
+  {% for qa in star_questions %}
+  <div style="margin-bottom: 20px; padding: 12px; background: #f6f8fa; border-radius: 6px;">
+    <p><strong>Q: {{ qa.question }}</strong></p>
+    <p><strong>Situation:</strong> {{ qa.situation }}</p>
+    <p><strong>Task:</strong> {{ qa.task }}</p>
+    <p><strong>Action:</strong> {{ qa.action }}</p>
+    <p><strong>Result:</strong> {{ qa.result }}</p>
+  </div>
+  {% endfor %}
+
+  {% if study_topics %}
+  <h3>Study topics</h3>
+  <ul>
+    {% for topic in study_topics %}
+    <li><strong>{{ topic.topic }}</strong> — {{ topic.why }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</body>
+</html>

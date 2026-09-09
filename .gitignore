@@ -1,7 +1,16 @@
 .env
 venv/
+.venv/
 __pycache__/
 *.pyc
 *.db
 .DS_Store
 node_modules/
+.pytest_cache/
+*.egg-info/
+
+# Personal application artifacts — never commit resumes/cover letters/exports
+exports/*
+!exports/.gitkeep
+reports/*
+!reports/.gitkeep

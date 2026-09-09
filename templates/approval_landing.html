@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Confirm your decision</title>
+  <style>
+    body { font-family: -apple-system, Helvetica, Arial, sans-serif; max-width: 480px; margin: 80px auto; color: #1a1a1a; }
+    .btn { padding: 12px 24px; border: none; border-radius: 6px; color: #fff; font-size: 16px; cursor: pointer; }
+    .approve { background: #1a7f37; }
+    .reject { background: #b91c1c; }
+    .error { color: #b91c1c; }
+  </style>
+</head>
+<body>
+  {% if error %}
+    <h2>Something's wrong</h2>
+    <p class="error">{{ error }}</p>
+
+  {% elif confirmed %}
+    <h2>Done</h2>
+    <p>
+      You <strong>{{ action }}d</strong> the application for
+      <strong>{{ title }}</strong> at <strong>{{ company }}</strong>.
+    </p>
+
+  {% else %}
+    <h2>Confirm: {{ action }}</h2>
+    <p>
+      {{ title }} at {{ company }}
+    </p>
+    <p>
+      Clicking below will {{ action }} this application. This link can only
+      be used once and expires after a few days.
+    </p>
+    <form method="POST" action="/respond/confirm">
+      <input type="hidden" name="token" value="{{ raw_token }}">
+      <button
+        type="submit"
+        class="btn {{ 'approve' if action == 'approve' else 'reject' }}">
+        Confirm {{ action }}
+      </button>
+    </form>
+  {% endif %}
+</body>
+</html>

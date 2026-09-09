@@ -1,0 +1,15 @@
+# Company career board URLs to scan.
+# Start with ONE Greenhouse board for the first end-to-end test run;
+# add more (and other ATS types) only after that pilot works cleanly.
+#
+# ats: one of "greenhouse" | "lever" | "workday"
+boards:
+  - company: "example-co"
+    ats: greenhouse
+    url: "https://boards.greenhouse.io/example-co"
+    enabled: false
+
+  # - company: "another-co"
+  #   ats: lever
+  #   url: "https://jobs.lever.co/another-co"
+  #   enabled: false

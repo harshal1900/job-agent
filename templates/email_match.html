@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>New job match</title>
+</head>
+<body style="font-family: -apple-system, Helvetica, Arial, sans-serif; color: #1a1a1a; max-width: 640px; margin: 0 auto; padding: 24px;">
+  <h2 style="margin-bottom: 4px;">{{ title }} @ {{ company }}</h2>
+  <p style="color: #555; margin-top: 0;">Match score: <strong>{{ match_score }}/100</strong></p>
+
+  {% if keyword_gaps %}
+  <h3>Keyword gaps</h3>
+  <ul>
+    {% for gap in keyword_gaps %}
+    <li>{{ gap }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <h3>Tailored resume bullets</h3>
+  <ul>
+    {% for bullet in resume_bullets %}
+    <li>{{ bullet }}</li>
+    {% endfor %}
+  </ul>
+
+  <h3>Cover letter paragraph</h3>
+  <p>{{ cover_letter_paragraph }}</p>
+
+  <div style="margin-top: 32px;">
+    <a href="{{ approve_url }}"
+       style="background: #1a7f37; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 6px; margin-right: 12px;">
+      Review &amp; Approve
+    </a>
+    <a href="{{ reject_url }}"
+       style="background: #b91c1c; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 6px;">
+      Reject
+    </a>
+  </div>
+
+  <p style="color: #888; font-size: 12px; margin-top: 24px;">
+    These links open a confirmation page — nothing is submitted until you
+    explicitly confirm there. Links expire and can only be used once.
+  </p>
+</body>
+</html>
