@@ -39,6 +39,98 @@ def _load_target_boards() -> list[dict]:
     return [b for b in data.get("boards", []) if b.get("enabled")]
 
 
+def _needs_scoring(job: Job) -> bool:
+    return job.match_score is None
+
+
+def _needs_tailoring(job: Job, session, settings) -> bool:
+    if job.match_score is None or job.match_score < settings.MATCH_SCORE_THRESHOLD:
+        return False
+    existing_app = (
+        session.query(Application).filter(Application.job_id == job.id).first()
+    )
+    return existing_app is None
+
+
+def _score_and_tailor(
+    session,
+    job: Job,
+    profile: dict,
+    scorer: MatchScorer,
+    rewriter: ResumeRewriter,
+    settings,
+) -> None:
+    """Score `job` if it doesn't have a score yet, then tailor + email it if
+    it scores at/above threshold and doesn't already have an Application.
+    Shared by scan_job() (brand-new postings) and retry_pending_jobs()
+    (existing postings that failed scoring or tailoring last time) so a
+    retry never re-scrapes and never redoes work that already succeeded.
+    """
+    if _needs_scoring(job):
+        try:
+            match_score_result = scorer.score(profile, job.description_raw or job.title)
+            job.match_score = match_score_result.match_score
+            job.keyword_gaps = json.dumps(match_score_result.keyword_gaps)
+            job.status = JobStatus.SCORED
+            session.flush()
+        except Exception:
+            logger.exception("Scoring failed for %s", job.source_url)
+            return
+        keyword_gaps = match_score_result.keyword_gaps
+    else:
+        keyword_gaps = json.loads(job.keyword_gaps or "[]")
+
+    if job.match_score < settings.MATCH_SCORE_THRESHOLD:
+        logger.info(
+            "%s scored %d (below MATCH_SCORE_THRESHOLD=%d) — leaving at SCORED, "
+            "no tailoring/email.",
+            job.source_url,
+            job.match_score,
+            settings.MATCH_SCORE_THRESHOLD,
+        )
+        return
+
+    if not _needs_tailoring(job, session, settings):
+        return
+
+    try:
+        rewrite = rewriter.rewrite(profile, job.description_raw or job.title, strict=True)
+    except HallucinationError:
+        logger.warning(
+            "Skipping %s — tailored draft failed the anti-hallucination guardrail; "
+            "needs manual tailoring instead of auto-email.",
+            job.source_url,
+        )
+        return
+    except Exception:
+        logger.exception("Tailoring failed for %s", job.source_url)
+        return
+
+    application = Application(
+        job_id=job.id,
+        resume_draft="\n".join(rewrite.resume_bullets),
+        cover_letter_draft=rewrite.cover_letter_paragraph,
+        status=JobStatus.PENDING_APPROVAL,
+    )
+    session.add(application)
+    job.status = JobStatus.PENDING_APPROVAL
+    session.flush()
+
+    approve_token = issue_token(session, application.id, TokenAction.APPROVE)
+    reject_token = issue_token(session, application.id, TokenAction.REJECT)
+
+    send_match_email(
+        company=job.company,
+        title=job.title,
+        match_score=job.match_score,
+        keyword_gaps=keyword_gaps,
+        resume_bullets=rewrite.resume_bullets,
+        cover_letter_paragraph=rewrite.cover_letter_paragraph,
+        approve_url=f"{settings.PUBLIC_BASE_URL}/respond/{approve_token.raw_token}",
+        reject_url=f"{settings.PUBLIC_BASE_URL}/respond/{reject_token.raw_token}",
+    )
+
+
 def scan_job() -> None:
     """One discovery -> score -> tailor -> save -> email cycle."""
     settings = get_settings()
@@ -84,49 +176,58 @@ def scan_job() -> None:
                 session.add(job)
                 session.flush()
 
-                try:
-                    match = scorer.score(profile, job.description_raw or job.title)
-                    job.match_score = match.match_score
-                    job.keyword_gaps = json.dumps(match.keyword_gaps)
-                    job.status = JobStatus.SCORED
+                _score_and_tailor(session, job, profile, scorer, rewriter, settings)
 
-                    rewrite = rewriter.rewrite(
-                        profile, job.description_raw or job.title, strict=True
-                    )
-                except HallucinationError:
-                    logger.warning(
-                        "Skipping %s — tailored draft failed the anti-hallucination "
-                        "guardrail; needs manual tailoring instead of auto-email.",
-                        job.source_url,
-                    )
-                    continue
-                except Exception:
-                    logger.exception("Scoring/tailoring failed for %s", job.source_url)
-                    continue
 
-                application = Application(
-                    job_id=job.id,
-                    resume_draft="\n".join(rewrite.resume_bullets),
-                    cover_letter_draft=rewrite.cover_letter_paragraph,
-                    status=JobStatus.PENDING_APPROVAL,
+def retry_pending_jobs() -> dict:
+    """Re-attempt scoring/tailoring for jobs already in the DB that either
+    never got a real score (a transient failure last time — rate limit,
+    malformed LLM output) or scored at/above threshold but never got a
+    successfully tailored Application. Does NOT re-scrape — uses the
+    description_raw already stored from the original scan. Use this after
+    fixing a transient failure or waiting out a rate limit, instead of
+    re-running scan_job() (which only looks at brand-new postings anyway —
+    it skips any source_url already in the DB, success or failure).
+    """
+    settings = get_settings()
+    profile = _load_profile()
+    scorer = MatchScorer()
+    rewriter = ResumeRewriter()
+
+    scored_now = 0
+    tailored_now = 0
+
+    with session_scope() as session:
+        candidates = (
+            session.query(Job)
+            .filter(
+                Job.status.notin_(
+                    [JobStatus.CLOSED, JobStatus.EXPIRED, JobStatus.REJECTED]
                 )
-                session.add(application)
-                job.status = JobStatus.PENDING_APPROVAL
-                session.flush()
+            )
+            .all()
+        )
+        for job in candidates:
+            needs_score = _needs_scoring(job)
+            needs_tailor = _needs_tailoring(job, session, settings)
+            if not (needs_score or needs_tailor):
+                continue
 
-                approve_token = issue_token(session, application.id, TokenAction.APPROVE)
-                reject_token = issue_token(session, application.id, TokenAction.REJECT)
+            _score_and_tailor(session, job, profile, scorer, rewriter, settings)
 
-                send_match_email(
-                    company=job.company,
-                    title=job.title,
-                    match_score=job.match_score,
-                    keyword_gaps=match.keyword_gaps,
-                    resume_bullets=rewrite.resume_bullets,
-                    cover_letter_paragraph=rewrite.cover_letter_paragraph,
-                    approve_url=f"{settings.PUBLIC_BASE_URL}/respond/{approve_token.raw_token}",
-                    reject_url=f"{settings.PUBLIC_BASE_URL}/respond/{reject_token.raw_token}",
-                )
+            if needs_score and job.match_score is not None:
+                scored_now += 1
+            if needs_tailor and _has_application(session, job):
+                tailored_now += 1
+
+    return {"scored_now": scored_now, "tailored_now": tailored_now}
+
+
+def _has_application(session, job: Job) -> bool:
+    return (
+        session.query(Application).filter(Application.job_id == job.id).first()
+        is not None
+    )
 
 
 def register_jobs(scheduler: BackgroundScheduler) -> None:

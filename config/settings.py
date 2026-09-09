@@ -37,7 +37,16 @@ class Settings(BaseSettings):
     SUPABASE_DB_URL: str = ""
 
     # --- LLM ---
-    LLM_PROVIDER: str = "openrouter"  # "openrouter" | "huggingface"
+    # Gemini is the default: gemini-3.5-flash-lite's free tier gives ~1,000
+    # requests/day at 15 RPM versus OpenRouter's 50/day free cap, which the
+    # scan pipeline hit in real use. (The non-lite gemini-3.5-flash model is
+    # NOT a good substitute here despite the better name — its free tier is
+    # only 20 requests/day, worse than OpenRouter.) OpenRouter stays fully
+    # wired as a fallback — set LLM_PROVIDER back to "openrouter" in .env to
+    # switch without any code change.
+    LLM_PROVIDER: str = "gemini"  # "gemini" | "openrouter" | "huggingface"
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-3.5-flash-lite"
     OPENROUTER_API_KEY: str = ""
     OPENROUTER_MODEL: str = "meta-llama/llama-3.1-8b-instruct:free"
     HF_API_TOKEN: str = ""
@@ -49,12 +58,25 @@ class Settings(BaseSettings):
     EMAIL_TO: str = ""
 
     # --- Webhook exposure ---
+    # Off by default per the PRD's risk note: a public tunnel should only be
+    # up during an actual approval window, not left running by default every
+    # time the server starts. Flip on in .env when you want one.
+    ENABLE_NGROK_TUNNEL: bool = False
+    APP_PORT: int = 8000
+    # Optional — only needed if the local `ngrok` binary isn't already
+    # authenticated via `ngrok config add-authtoken`.
     NGROK_AUTHTOKEN: str = ""
     PUBLIC_BASE_URL: str = "http://localhost:8000"
 
     # --- Approval token signing ---
     APPROVAL_TOKEN_SECRET: str = ""
     APPROVAL_TOKEN_TTL_SECONDS: int = 259200  # 72h
+
+    # --- Matching ---
+    # Jobs scoring below this never get tailored or emailed — just scored
+    # and left at JobStatus.SCORED. Without this, scan_job() would tailor +
+    # email every single successfully-scored posting regardless of fit.
+    MATCH_SCORE_THRESHOLD: int = 70
 
     # --- Scraper etiquette ---
     SCRAPER_MIN_DELAY_SECONDS: float = 3.0

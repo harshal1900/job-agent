@@ -121,3 +121,42 @@ def test_rewrite_surfaces_clear_error_instead_of_crashing_on_truncated_reply():
 
     with pytest.raises(ValueError, match="looks truncated"):
         rewriter.rewrite(PROFILE, "Backend role", strict=True)
+
+
+def test_build_fact_vocabulary_includes_integer_profile_values():
+    # A real production false-positive: years_of_experience is a JSON int,
+    # not a string, so a profile with only str-value flattening would drop
+    # it entirely and flag any rewrite mentioning it as unsupported.
+    profile = {**PROFILE, "years_of_experience": 14}
+    vocab = build_fact_vocabulary(profile)
+    assert "14" in vocab
+
+
+def test_build_fact_vocabulary_indexes_bare_number_from_plus_suffixed():
+    # Profiles write experience as "14+ years"; a rewrite naturally states
+    # it bare ("14 years") -- both forms must be recognized as grounded.
+    profile = {**PROFILE, "summary": "14+ years of experience"}
+    vocab = build_fact_vocabulary(profile)
+    assert "14" in vocab
+    assert "14+" in vocab
+
+
+def test_rewrite_does_not_flag_terms_echoed_from_job_description():
+    # Referencing the role/company the job posting already named is not a
+    # hallucination -- it's grounded in text the model was actually given,
+    # just not in the candidate profile. Only terms in neither should flag.
+    job_description = "We're hiring a Logistics Analyst for our U.S. team."
+    reply = json.dumps(
+        {
+            "resume_bullets": [
+                "Built a Python service at Initech handling 10,000 requests per day"
+            ],
+            "cover_letter_paragraph": (
+                "I'm well-suited to be your next Logistics Analyst for the U.S. team."
+            ),
+        }
+    )
+    rewriter = ResumeRewriter(llm_client=FakeLLMClient(reply))
+
+    result = rewriter.rewrite(PROFILE, job_description, strict=True)
+    assert result.unsupported_terms == []

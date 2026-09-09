@@ -60,6 +60,10 @@ _NUMBER_RE = re.compile(r"\b\d[\d,\.]*%?\b")
 def _flatten_strings(obj) -> str:
     if isinstance(obj, str):
         return obj + " "
+    # bool is a subclass of int -- exclude it so True/False don't get
+    # stringified into meaningless vocabulary noise.
+    if isinstance(obj, (int, float)) and not isinstance(obj, bool):
+        return str(obj) + " "
     if isinstance(obj, dict):
         return "".join(_flatten_strings(v) for v in obj.values())
     if isinstance(obj, list):
@@ -67,11 +71,42 @@ def _flatten_strings(obj) -> str:
     return ""
 
 
-def build_fact_vocabulary(profile: dict) -> set[str]:
-    """Lowercased word tokens drawn from every string value in the profile."""
-    text = _flatten_strings(profile)
+_TRAILING_PUNCT = ".,+%"
+
+
+def _tokenize(text: str) -> set[str]:
     words = re.findall(r"[a-zA-Z0-9][a-zA-Z0-9\-\+\.#%,]*", text.lower())
-    return set(words)
+    vocab = set(words)
+
+    # This regex is deliberately loose (keeps "+"/"."/"%"/"," attached) so
+    # it can grab compound tokens like "14+", "u.s.", "40-60%" whole. But
+    # find_unsupported_terms() extracts candidates from the *generated*
+    # text with a stricter \b-bounded regex that can't end a match on
+    # trailing punctuation, and can't span a "-" the way this one does --
+    # so "14+" here vs. "14" there, or "40-60%" here vs. "40"/"60" there,
+    # would otherwise never match even though they're the same grounded
+    # fact. Derive and index the forms the other regex would actually
+    # produce: trailing punctuation stripped, and each hyphen-separated
+    # part on its own (for ranges like "40-60%" and compounds like
+    # "co-designing").
+    derived: set[str] = set()
+    for word in vocab:
+        stripped = word.rstrip(_TRAILING_PUNCT)
+        if stripped:
+            derived.add(stripped)
+        if "-" in word:
+            for part in word.split("-"):
+                part = part.rstrip(_TRAILING_PUNCT)
+                if part:
+                    derived.add(part)
+    vocab |= derived
+    return vocab
+
+
+def build_fact_vocabulary(profile: dict) -> set[str]:
+    """Lowercased word tokens drawn from every string/number value in the
+    profile, including trailing-'+' variants of numbers ("14+" -> "14")."""
+    return _tokenize(_flatten_strings(profile))
 
 
 def find_unsupported_terms(text: str, vocabulary: set[str]) -> list[str]:
@@ -154,7 +189,12 @@ class ResumeRewriter:
         callers that want to inspect/log flagged terms without raising
         should pass strict=False.
         """
-        vocabulary = build_fact_vocabulary(profile)
+        # A tailored cover letter legitimately echoes back terms from the
+        # job posting itself (the role title, the company name, "U.S.",
+        # etc.) — that's not the model inventing a candidate fact, since
+        # it's already grounded in text the model was actually given. Only
+        # flag terms present in NEITHER the profile NOR the job posting.
+        vocabulary = build_fact_vocabulary(profile) | _tokenize(job_description)
 
         prompt = _REWRITE_PROMPT.format(
             profile_json=json.dumps(profile, indent=2),
