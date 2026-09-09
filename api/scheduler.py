@@ -96,11 +96,17 @@ def _score_and_tailor(
 
     try:
         rewrite = rewriter.rewrite(profile, job.description_raw or job.title, strict=True)
-    except HallucinationError:
+    except HallucinationError as exc:
+        # str(exc) carries the actual flagged terms (see HallucinationError's
+        # raise site in resume_rewriter.py) -- log it, not just the fact that
+        # it happened, so a real catch vs. a false-positive pattern can
+        # actually be told apart after the fact instead of needing a fresh,
+        # possibly non-reproducing regeneration to find out.
         logger.warning(
-            "Skipping %s — tailored draft failed the anti-hallucination guardrail; "
-            "needs manual tailoring instead of auto-email.",
+            "Skipping %s — tailored draft failed the anti-hallucination guardrail "
+            "(%s); needs manual tailoring instead of auto-email.",
             job.source_url,
+            exc,
         )
         return
     except Exception:

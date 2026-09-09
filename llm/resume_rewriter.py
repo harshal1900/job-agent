@@ -109,22 +109,67 @@ def build_fact_vocabulary(profile: dict) -> set[str]:
     return _tokenize(_flatten_strings(profile))
 
 
+def _is_sentence_initial(text: str, start: int) -> bool:
+    """True if the char at `start` opens the string or follows sentence-end
+    punctuation. An ordinary word ("Operating", "Furthermore") is only
+    capitalized because English capitalizes sentence starts, not because
+    it's a proper noun -- that capitalization carries no signal at all."""
+    prefix = text[:start].rstrip()
+    return not prefix or prefix[-1] in ".!?\n"
+
+
+def _in_vocabulary(key: str, vocabulary: set[str]) -> bool:
+    # Simple plural fallback: a rewrite may pluralize a grounded singular
+    # term ("UI" -> "UIs") in a way build_fact_vocabulary() never
+    # anticipated. Only forgives terms whose singular form is already a
+    # confirmed grounded fact -- it can't mask an unrelated invention.
+    return key in vocabulary or (key.endswith("s") and key[:-1] in vocabulary)
+
+
 def find_unsupported_terms(text: str, vocabulary: set[str]) -> list[str]:
     """Flag numbers/proper-noun-like tokens in `text` absent from `vocabulary`.
 
     Heuristic guardrail, not exhaustive fact-checking — see module docstring.
     """
-    candidates = _PROPER_NOUN_RE.findall(text) + _NUMBER_RE.findall(text)
+    proper_noun_matches = list(_PROPER_NOUN_RE.finditer(text))
+    number_matches = list(_NUMBER_RE.finditer(text))
+
+    # A capitalized word is only treated as a genuine proper-noun candidate
+    # if at least one of its occurrences is NOT sentence-initial -- real
+    # proper nouns (invented companies, tools) keep their capitalization
+    # regardless of position; ordinary words are capitalized only when a
+    # sentence happens to start with them. Applies to proper-noun candidates
+    # only, not numbers (a number's position carries no such signal).
+    sentence_initial_everywhere: dict[str, bool] = {}
+    for m in proper_noun_matches:
+        key = m.group(0).lower()
+        is_initial = _is_sentence_initial(text, m.start())
+        sentence_initial_everywhere[key] = sentence_initial_everywhere.get(key, True) and is_initial
 
     unsupported: list[str] = []
     seen: set[str] = set()
-    for term in candidates:
+    for m in proper_noun_matches:
+        term = m.group(0)
         key = term.lower()
         if key in seen or key in _SAFE_WORDS:
             continue
-        if key not in vocabulary:
-            unsupported.append(term)
-            seen.add(key)
+        if _in_vocabulary(key, vocabulary):
+            continue
+        if sentence_initial_everywhere[key]:
+            continue
+        unsupported.append(term)
+        seen.add(key)
+
+    for m in number_matches:
+        term = m.group(0)
+        key = term.lower()
+        if key in seen or key in _SAFE_WORDS:
+            continue
+        if _in_vocabulary(key, vocabulary):
+            continue
+        unsupported.append(term)
+        seen.add(key)
+
     return unsupported
 
 

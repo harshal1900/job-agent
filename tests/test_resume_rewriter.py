@@ -51,6 +51,41 @@ def test_find_unsupported_terms_flags_invented_company():
     assert "Python" not in unsupported
 
 
+def test_find_unsupported_terms_does_not_flag_ordinary_word_at_sentence_start():
+    # Real false positives caught in production: "Furthermore" and
+    # "Operating" are ordinary English words capitalized only because they
+    # happen to start a sentence, not because they're invented proper
+    # nouns. Neither appears anywhere in the profile vocabulary.
+    vocab = build_fact_vocabulary(PROFILE)
+    text = (
+        "Furthermore, I bring strong Python skills. "
+        "Operating within regulated environments is a core strength."
+    )
+    unsupported = find_unsupported_terms(text, vocab)
+    assert "Furthermore" not in unsupported
+    assert "Operating" not in unsupported
+
+
+def test_find_unsupported_terms_still_flags_proper_noun_that_starts_a_sentence():
+    # The sentence-initial leniency must not blanket-whitelist every
+    # sentence-starting capitalized word -- a genuine invented proper noun
+    # that also recurs mid-sentence elsewhere is still a real catch.
+    vocab = build_fact_vocabulary(PROFILE)
+    text = "Globex is where I built key systems. I later returned to Globex for a second project."
+    unsupported = find_unsupported_terms(text, vocab)
+    assert "Globex" in unsupported
+
+
+def test_find_unsupported_terms_recognizes_plural_of_grounded_term():
+    # Real false positive caught in production: "UIs" (plural of "UI")
+    # didn't match the grounded singular "UI" in the vocabulary.
+    profile = {**PROFILE, "summary": "Experience building enterprise UI systems."}
+    vocab = build_fact_vocabulary(profile)
+    text = "Delivered several enterprise UIs using Python."
+    unsupported = find_unsupported_terms(text, vocab)
+    assert "UIs" not in unsupported
+
+
 def test_rewrite_raises_on_hallucinated_output():
     reply = json.dumps(
         {
