@@ -7,9 +7,14 @@ requires touching call sites in llm/match_scorer.py or llm/resume_rewriter.py.
 
 from __future__ import annotations
 
+import logging
+import time
+
 import httpx
 
 from config.settings import get_settings
+
+logger = logging.getLogger(__name__)
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 HF_URL_TEMPLATE = "https://api-inference.huggingface.co/models/{model}"
@@ -17,6 +22,14 @@ HF_URL_TEMPLATE = "https://api-inference.huggingface.co/models/{model}"
 
 class LLMError(RuntimeError):
     pass
+
+
+class EmptyLLMResponseError(LLMError):
+    """Raised when the provider returns a null/empty message body — seen
+    intermittently from free-tier OpenRouter models. chat() retries on this
+    specific error before giving up; it is never raised for other failures
+    (bad auth, rate limits, malformed response shape), which fail fast
+    instead since retrying wouldn't help."""
 
 
 class LLMClient:
@@ -28,8 +41,38 @@ class LLMClient:
         messages: list[dict[str, str]],
         temperature: float = 0.2,
         max_tokens: int = 1024,
+        max_retries: int = 2,
+        retry_delay_seconds: float = 1.0,
     ) -> str:
-        """Send a chat-style prompt and return the model's text reply."""
+        """Send a chat-style prompt and return the model's text reply.
+
+        Retries up to `max_retries` times if the provider returns a
+        null/empty message body, since that's been observed to be
+        transient rather than a real failure. Any other error (bad auth,
+        rate limit, malformed response) is raised immediately without
+        retrying.
+        """
+        last_error: EmptyLLMResponseError | None = None
+        for attempt in range(1, max_retries + 2):
+            try:
+                return self._dispatch(messages, temperature, max_tokens)
+            except EmptyLLMResponseError as exc:
+                last_error = exc
+                logger.warning(
+                    "LLM returned empty/null content on attempt %d/%d — %s",
+                    attempt,
+                    max_retries + 1,
+                    "retrying" if attempt <= max_retries else "giving up",
+                )
+                if attempt <= max_retries:
+                    time.sleep(retry_delay_seconds)
+
+        assert last_error is not None
+        raise last_error
+
+    def _dispatch(
+        self, messages: list[dict[str, str]], temperature: float, max_tokens: int
+    ) -> str:
         if self.settings.LLM_PROVIDER == "openrouter":
             return self._chat_openrouter(messages, temperature, max_tokens)
         if self.settings.LLM_PROVIDER == "huggingface":
@@ -63,9 +106,15 @@ class LLMClient:
 
         data = response.json()
         try:
-            return data["choices"][0]["message"]["content"]
+            content = data["choices"][0]["message"]["content"]
         except (KeyError, IndexError) as exc:
             raise LLMError(f"Unexpected OpenRouter response shape: {data}") from exc
+
+        if not content:
+            raise EmptyLLMResponseError(
+                f"OpenRouter returned null/empty message content: {data}"
+            )
+        return content
 
     def _chat_huggingface(
         self, messages: list[dict[str, str]], temperature: float, max_tokens: int
@@ -94,5 +143,10 @@ class LLMClient:
 
         data = response.json()
         if isinstance(data, list) and data and "generated_text" in data[0]:
-            return data[0]["generated_text"]
+            generated_text = data[0]["generated_text"]
+            if not generated_text:
+                raise EmptyLLMResponseError(
+                    f"HF Inference returned null/empty generated_text: {data}"
+                )
+            return generated_text
         raise LLMError(f"Unexpected HF response shape: {data}")

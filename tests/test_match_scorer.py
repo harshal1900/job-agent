@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import json
 
-from llm.match_scorer import MatchScorer
+import pytest
+
+from llm.match_scorer import MatchScorer, _extract_json
 
 
 class FakeLLMClient:
@@ -37,3 +39,23 @@ def test_score_handles_reply_with_surrounding_text():
     result = scorer.score({}, "JD text")
 
     assert result.match_score == 50
+
+
+def test_extract_json_raises_clear_error_on_none_instead_of_typeerror():
+    with pytest.raises(ValueError, match="empty/non-string content"):
+        _extract_json(None)
+
+
+def test_extract_json_raises_clear_error_on_empty_string():
+    with pytest.raises(ValueError, match="empty/non-string content"):
+        _extract_json("")
+
+
+def test_score_surfaces_clear_error_when_llm_client_returns_none():
+    # Regression test: previously a None reply crashed deep inside re.search
+    # with a bare "TypeError: expected string or bytes-like object, got
+    # 'NoneType'" instead of a clear, actionable error.
+    scorer = MatchScorer(llm_client=FakeLLMClient(None))
+
+    with pytest.raises(ValueError, match="empty/non-string content"):
+        scorer.score({}, "JD text")

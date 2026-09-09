@@ -33,6 +33,14 @@ class MatchResult:
 
 
 def _extract_json(text: str) -> dict:
+    # Defense in depth: llm/client.py's LLMClient.chat() already retries and
+    # raises EmptyLLMResponseError rather than returning None/"" for a
+    # null-content reply, so `text` shouldn't reach here empty — but a null
+    # check right before regex/string ops means a future provider path that
+    # skips that guard fails with a clear message here instead of a bare
+    # TypeError out of re.search.
+    if not text or not isinstance(text, str):
+        raise ValueError(f"LLM returned empty/non-string content, cannot parse: {text!r}")
     match = re.search(r"\{.*\}", text, re.DOTALL)
     if not match:
         raise ValueError(f"No JSON object found in LLM response: {text!r}")

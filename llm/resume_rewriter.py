@@ -97,11 +97,47 @@ class HallucinationError(RuntimeError):
     """Raised when a rewrite contains terms not traceable to the profile."""
 
 
+# Resume bullets + a cover letter paragraph for a detailed, senior-level
+# profile can comfortably exceed LLMClient.chat()'s default 1024-token cap,
+# which silently truncates the reply mid-JSON rather than erroring — this
+# was observed in practice cutting a reply off mid-string with no closing
+# brace. 2048 gives real headroom without being wastefully large.
+_REWRITE_MAX_TOKENS = 2048
+
+
 @dataclass
 class RewriteResult:
     resume_bullets: list[str]
     cover_letter_paragraph: str
     unsupported_terms: list[str] = field(default_factory=list)
+
+
+def _parse_rewrite_reply(reply: str) -> dict:
+    """Parse the rewrite JSON reply, raising a clear, specific ValueError
+    instead of a bare crash (or, previously, an unguarded json.JSONDecodeError)
+    when the reply is truncated or otherwise malformed. A raised error here
+    leaves the Job at SCORED with no Application row, which
+    api/scheduler.py's retry_pending_jobs() will pick back up on the next
+    retry pass — so failing loudly and specifically (rather than silently
+    producing nothing) is what makes that retry actually effective.
+    """
+    match = re.search(r"\{.*\}", reply, re.DOTALL)
+    if not match:
+        preview = reply[:200]
+        if reply.strip().startswith("{"):
+            raise ValueError(
+                "Rewrite response looks truncated (starts with '{' but has no "
+                f"closing '}}' anywhere in {len(reply)} chars) — preview: {preview!r}"
+            )
+        raise ValueError(f"No JSON object found in rewrite response — preview: {preview!r}")
+
+    try:
+        return json.loads(match.group(0))
+    except json.JSONDecodeError as exc:
+        preview = match.group(0)[:200]
+        raise ValueError(
+            f"Rewrite response contains malformed JSON ({exc}) — preview: {preview!r}"
+        ) from exc
 
 
 class ResumeRewriter:
@@ -134,12 +170,10 @@ class ResumeRewriter:
                 {"role": "user", "content": prompt},
             ],
             temperature=0.2,
+            max_tokens=_REWRITE_MAX_TOKENS,
         )
 
-        match = re.search(r"\{.*\}", reply, re.DOTALL)
-        if not match:
-            raise ValueError(f"No JSON object found in LLM response: {reply!r}")
-        parsed = json.loads(match.group(0))
+        parsed = _parse_rewrite_reply(reply)
 
         bullets = list(parsed.get("resume_bullets", []))
         cover_paragraph = str(parsed.get("cover_letter_paragraph", ""))
