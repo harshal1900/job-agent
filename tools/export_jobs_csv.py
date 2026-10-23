@@ -7,10 +7,13 @@ when it was posted, how well it fits, and the link. Pick rows with --keys (the
 `added` keys /scrape prints), --since, --status or --min-score; with no selection
 every stored job is exported.
 
-    python3 tools/export_jobs_csv.py --keys-file added.json
+    python3 tools/export_jobs_csv.py                      # everything stored
     python3 tools/export_jobs_csv.py --since 2026-10-01 --status new,ranked
 
-The default output is exports/jobs_<YYYY-MM-DD>.csv (exports/ is gitignored).
+With no selection the output is the living file exports/jobs.csv, which /scrape and
+/rank both refresh so it always matches the stored jobs. A filtered export goes to
+exports/jobs_filtered_<YYYY-MM-DD>.csv so it can never overwrite the full file.
+(exports/ is gitignored.)
 """
 
 import argparse
@@ -144,7 +147,7 @@ def main() -> int:
     parser.add_argument("--status", help="comma-separated statuses, e.g. new,ranked")
     parser.add_argument("--since", help="only jobs first seen on or after this date (YYYY-MM-DD)")
     parser.add_argument("--min-score", type=float, help="only ranked jobs with rank_score at or above this")
-    parser.add_argument("--out", help="output path (default exports/jobs_<today>.csv)")
+    parser.add_argument("--out", help="output path (default exports/jobs.csv, or exports/jobs_filtered_<date>.csv when filtering)")
     parser.add_argument("--state", type=Path, default=STATE, help=argparse.SUPPRESS)
     args = parser.parse_args()
     try:
@@ -158,7 +161,9 @@ def main() -> int:
         )
         if not rows:
             raise ValueError(explain_empty(seen, parse_keys(args), args))
-        out = Path(args.out) if args.out else ROOT / "exports" / f"jobs_{date.today().isoformat()}.csv"
+        filtered = bool(args.keys or args.keys_file or args.status or args.since or args.min_score is not None)
+        name = f"jobs_filtered_{date.today().isoformat()}.csv" if filtered else "jobs.csv"
+        out = Path(args.out) if args.out else ROOT / "exports" / name
         count = write_csv(rows, out)
     except (ValueError, OSError) as exc:
         print(f"export_jobs_csv: {exc}", file=sys.stderr)

@@ -295,19 +295,20 @@ LinkedIn search links:
 - Role/team-peer search link, for the warm-intro / informational-outreach path
 ```
 
-**Export the CSV.** Right after the table, write every job from this run (the `added` keys that
-`scrape_state.py store` printed in Step 4) to a spreadsheet-ready file:
+**Refresh the CSV.** Right after the table, rewrite the living spreadsheet of every stored job:
 
 ```bash
-python3 tools/export_jobs_csv.py --keys-file "<temporary file holding the store output>"
+python3 tools/export_jobs_csv.py
 ```
 
-It writes `exports/jobs_<YYYY-MM-DD>.csv` (gitignored; opens in Excel and Sheets) with one row per
-job: rank score and verdict, fit, status, title, company, location, country, work mode, employment
-type, department, salary, posted date, deadline, first seen, portal, source, link, requirements and
-summary. Tell the user the path and the row count. When the run found no new jobs, skip the export. If the tool exits 1 it prints why nothing matched and writes no file: show that message to the user rather than reporting an empty CSV. To
-export everything ever stored, or a slice, the user can ask for it: `python3 tools/export_jobs_csv.py
-[--since YYYY-MM-DD] [--status new,ranked] [--min-score N]`.
+It writes `exports/jobs.csv` (gitignored; opens in Excel and Sheets) with one row per stored job,
+ranked jobs first: rank score and verdict, fit, status, title, company, location, country, work
+mode, employment type, department, salary, posted date, deadline, first seen, portal, source, link,
+requirements and summary. `/rank` refreshes the same file after it scores jobs, so the sheet never
+goes stale. Tell the user the path and the row count. If the tool exits 1 it prints why nothing
+matched and writes no file: show that message to the user rather than reporting an empty CSV. For a
+slice, the user can ask for `python3 tools/export_jobs_csv.py [--since YYYY-MM-DD] [--status new,ranked]
+[--min-score N]`, which goes to `exports/jobs_filtered_<date>.csv`.
 
 After presenting, ask:
 > "Want me to evaluate any of these in detail? Just give me the number(s)."

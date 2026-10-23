@@ -20,7 +20,7 @@ your CV          watch                          Reviewer critiques, revise
 | Command | What you get |
 |---|---|
 | `/setup` | Your profile, built from a CV (Word, PDF, Markdown or LaTeX), your LinkedIn export, or a short interview |
-| `/scrape` | New postings from Greenhouse, Lever, Ashby and Workday career boards (US and Canada), plus LinkedIn and freehire, and a CSV (`exports/jobs_<date>.csv`) with every detail of each job |
+| `/scrape` | New postings from Greenhouse, Lever, Ashby and Workday career boards (US and Canada), plus LinkedIn and freehire, and a spreadsheet (`exports/jobs.csv`, refreshed by `/rank`) with every detail of each job |
 | `/rank` | A ranked shortlist: each posting scored on skills, experience, culture, location and career fit, with honest gaps |
 | `/apply <url>` | A fit evaluation, then a tailored CV and cover letter, reviewed by a second agent, compiled, and checked as PDFs |
 | `/outcome` | Result tracking, archived materials, follow-up drafts |

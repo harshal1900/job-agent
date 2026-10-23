@@ -1,6 +1,8 @@
 """The CSV export carries every stored field, in a stable order, safe for spreadsheets."""
 
+import contextlib
 import csv
+import io
 import json
 import subprocess
 import sys
@@ -10,6 +12,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 TOOL = ROOT / "tools" / "export_jobs_csv.py"
+sys.path.insert(0, str(ROOT / "tools"))
+import export_jobs_csv  # noqa: E402
 
 JOBS = {
     "a-1": {
@@ -85,6 +89,36 @@ class ExportJobsCsvTests(unittest.TestCase):
         kf.write_text(json.dumps({"added": ["b-2"], "already_seen": 4}), encoding="utf-8")
         self.assertEqual(self.run_tool("--keys-file", str(kf))["rows"], 1)
         self.assertEqual(self.rows()[0]["key"], "b-2")
+
+    def run_default_path(self, *flags):
+        """Run main() without --out, so the default file name is exercised in a temp root."""
+        argv = ["export_jobs_csv.py", "--state", str(self.state), *flags]
+        original_root, original_argv = export_jobs_csv.ROOT, sys.argv
+        export_jobs_csv.ROOT, sys.argv = self.dir, argv
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(export_jobs_csv.main(), 0)
+        finally:
+            export_jobs_csv.ROOT, sys.argv = original_root, original_argv
+        return sorted(p.name for p in (self.dir / "exports").iterdir())
+
+    def test_full_export_is_one_living_file_and_a_filtered_one_never_overwrites_it(self):
+        self.assertEqual(self.run_default_path(), ["jobs.csv"])
+        before = (self.dir / "exports" / "jobs.csv").read_bytes()
+        names = self.run_default_path("--status", "new")
+        self.assertEqual([n for n in names if n != "jobs.csv"][0][:14], "jobs_filtered_")
+        self.assertEqual((self.dir / "exports" / "jobs.csv").read_bytes(), before)
+
+    def test_rerun_after_ranking_shows_the_new_scores(self):
+        self.run_default_path()
+        ranked = json.loads(self.state.read_text(encoding="utf-8"))
+        ranked["seen"]["b-2"].update({"status": "ranked", "rank_score": 95, "rank_verdict": "strong fit"})
+        self.state.write_text(json.dumps(ranked), encoding="utf-8")
+        self.run_default_path()
+        with (self.dir / "exports" / "jobs.csv").open(encoding="utf-8-sig", newline="") as fh:
+            rows = list(csv.DictReader(fh))
+        self.assertEqual(rows[0]["key"], "b-2")
+        self.assertEqual((rows[0]["rank_score"], rows[0]["status"]), ("95", "ranked"))
 
     def test_bom_is_written(self):
         self.run_tool()

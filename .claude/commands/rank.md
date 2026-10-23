@@ -145,6 +145,8 @@ The tool also stores the agent's `guard` verdict line as `"guard"` (additive; ab
 
 `apply` prints back exactly the rows Step 5 needs - `ranked`, `vetoed`, `expired`, `unreachable`, `gave_up`, `errors` - so the report is written from its output and `job_scraper/seen_jobs.json` is never re-read to build it. A non-empty `errors` array (an unknown key, a missing score) exits non-zero: report those jobs as unscored rather than presenting a shortlist that quietly dropped them.
 
+**Refresh the spreadsheet.** After `apply` succeeds (and after any `sweep --write`), run `python3 tools/export_jobs_csv.py` so `exports/jobs.csv`, the sheet `/scrape` created, carries the new scores, verdicts and statuses. Mention the path in the Step 5 report. If the tool exits 1 or fails, say so in one line and continue; the shortlist does not depend on it.
+
 Do not modify `job_search_tracker.csv` - that file records applications, and `/rank` never applies. Re-running `/rank` never re-scores an already-`ranked` job unless `--all` says so, so scoring is idempotent. **Rule 6's sweep is the deliberate exception and still runs**: it re-reads stored deadlines for exactly those skipped entries and may retire one to `expired`. That is not a re-score and costs no fetch, and skipping it because the entry was "already ranked" is what would leave a closed posting on the shortlist indefinitely.
 
 ---
