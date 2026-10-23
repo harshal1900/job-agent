@@ -58,7 +58,7 @@ export function parseFlags(argv: string[]): Flags {
   return flags
 }
 
-const HELP = `ats-search — search company job boards on Greenhouse, Lever, Ashby and Workday (US & Canada)
+const HELP = `ats-search — search company job boards on Greenhouse, Lever, Ashby, Workday, Amazon and Microsoft (US & Canada)
 
 USAGE
   bun run src/cli.ts search [-q "<keywords>"] [filters] [--format json|table|plain]
@@ -70,6 +70,7 @@ WATCHLIST
   --companies <file> or ATS_COMPANIES, and add ad-hoc boards with --board
   (repeatable): greenhouse:stripe  lever:palantir  ashby:ramp
                 workday:nvidia.wd5/NVIDIAExternalCareerSite
+                amazon:amazon  microsoft:microsoft
 
 SEARCH FLAGS
   --query, -q <text>          Words that must appear in the title or department.
@@ -79,14 +80,14 @@ SEARCH FLAGS
   --location <text>           Only locations containing this text (e.g. Seattle).
   --remote <mode>             remote | hybrid | onsite (comma = OR; bare = remote).
   --jobage <days>             Posted within N days (jobs with no date are dropped).
-  --ats <list>                Restrict to greenhouse,lever,ashby,workday.
+  --ats <list>                Restrict to greenhouse,lever,ashby,workday,amazon,microsoft.
   --company <text>            Only boards whose token or name contains this (comma = OR).
   --limit, -n <n>             Results to return. Default 25.
   --page <n>                  1-indexed page of --limit results. Default 1.
   --offset <n>                Skip the first n results instead of using --page.
   --include-unspecified-location
                               Keep jobs whose location is just "Remote" or blank.
-  --max-per-board <n>         Workday only: postings downloaded per query and board
+  --max-per-board <n>         Workday, Amazon, Microsoft: postings downloaded per query and board
                               (min 20, default 100). Raise it for big tenants.
   --no-description            Skip fetching descriptions (faster discovery pass).
   --format <fmt>              json (default) | table | plain.

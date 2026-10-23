@@ -3,7 +3,7 @@ name: ats-search
 version: 1.0.0
 description: >
   Use this skill to search live job postings at the companies you watch on the four
-  big applicant-tracking systems - Greenhouse, Lever, Ashby and Workday - filtered to
+  big applicant-tracking systems - Greenhouse, Lever, Ashby and Workday - plus Amazon's and Microsoft's own careers sites, filtered to
   the United States and Canada. It reads each company's public job board directly, so
   postings are first-hand, full-text, dated and (where the company publishes it) carry
   a salary range. Trigger phrases: find jobs at <company>, check <company>'s careers
@@ -48,13 +48,13 @@ bun run .agents/skills/ats-search/cli/src/cli.ts search [-q "<keywords>"] [filte
 | `--location <text>` | Only jobs with a location containing this text, e.g. `--location Seattle`. |
 | `--remote <mode>` | `remote`, `hybrid` or `onsite` (comma = OR; bare `--remote` = remote). Jobs whose board does not publish a workplace type match `remote` only when the location text says remote. |
 | `--jobage <days>` | Posted within N days. Jobs with no date are dropped (`meta.dropped_unknown_date`); on Workday, "Posted 30+ Days Ago" has no date. |
-| `--ats <list>` | Restrict to `greenhouse,lever,ashby,workday`. |
+| `--ats <list>` | Restrict to `greenhouse,lever,ashby,workday,amazon,microsoft`. |
 | `--company <text>` | Only boards whose token or name contains this (comma = OR). |
-| `--board <spec>` | Add an ad-hoc board (repeatable): `greenhouse:stripe`, `lever:palantir`, `ashby:ramp`, `workday:nvidia.wd5/NVIDIAExternalCareerSite`. |
+| `--board <spec>` | Add an ad-hoc board (repeatable): `greenhouse:stripe`, `lever:palantir`, `ashby:ramp`, `workday:nvidia.wd5/NVIDIAExternalCareerSite`, `amazon:amazon`, `microsoft:microsoft`. |
 | `--companies <file>` | Use another watchlist file (also `ATS_COMPANIES`). |
 | `--limit`, `-n <n>` | Results returned. Default 25. |
 | `--page <n>` / `--offset <n>` | Paging over the sorted result set (use one). |
-| `--max-per-board <n>` | Workday only: postings downloaded per query and board, min 20, default 100. When a tenant has more, it is listed in `meta.truncated_boards`; raise this or narrow the query. |
+| `--max-per-board <n>` | Workday, Amazon and Microsoft: postings downloaded per query and board, min 20, default 100. When a tenant has more, it is listed in `meta.truncated_boards`; raise this or narrow the query. |
 | `--include-unspecified-location` | Keep jobs whose location is just "Remote" or blank. |
 | `--no-description` | Skip descriptions for a faster discovery pass. |
 | `--format json\|table\|plain` | Default `json`. Only `json` carries descriptions. |
@@ -144,6 +144,12 @@ ATS vendors: a `404` ("board not found") means the token is wrong or the company
 ## Notes
 
 - **Health check:** `companies --check` is the cheap probe for `/scrape health` - it reads every watchlist board once and reports `ok` or the failure reason.
+- **Amazon and Microsoft are first-party company sites, not ATS products.** `amazon:amazon`
+  reads amazon.jobs' public JSON search (country filter and a posted date, description included);
+  `microsoft:microsoft` reads Microsoft's careers search (10 postings per page, one request per
+  country and query, paced to stay under its rate limit, description fetched only for the jobs
+  returned). Both are unofficial and can change without notice. Google, Meta, Apple and Netflix
+  expose no comparable public feed, so use `linkedin-search` for them.
 - **Workday is unofficial.** Greenhouse, Lever and Ashby publish these APIs for exactly
   this use; Workday's JSON endpoint is what its own careers pages call. It can change
   without notice, and a changed response is reported as an error naming the tenant.

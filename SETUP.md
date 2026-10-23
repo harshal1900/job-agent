@@ -30,7 +30,7 @@ On Windows, `py --version` is often the most reliable check. If your system expo
 
 ### Bun (for job search tools)
 
-The job-board CLIs (`ats-search` for Greenhouse, Lever, Ashby and Workday, plus `linkedin-search` and `freehire-search`) are written in TypeScript and run with Bun.
+The job-board CLIs (`ats-search` for Greenhouse, Lever, Ashby, Workday, Amazon and Microsoft, plus `linkedin-search` and `freehire-search`) are written in TypeScript and run with Bun.
 
 - macOS/Linux:
 

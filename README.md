@@ -20,7 +20,7 @@ your CV          watch                          Reviewer critiques, revise
 | Command | What you get |
 |---|---|
 | `/setup` | Your profile, built from a CV (Word, PDF, Markdown or LaTeX), your LinkedIn export, or a short interview |
-| `/scrape` | New postings from Greenhouse, Lever, Ashby and Workday career boards (US and Canada), plus LinkedIn and freehire, and a spreadsheet (`exports/jobs.csv`, refreshed by `/rank`) with every detail of each job |
+| `/scrape` | New postings from Greenhouse, Lever, Ashby and Workday career boards plus Amazon and Microsoft careers (US and Canada), plus LinkedIn and freehire, and a spreadsheet (`exports/jobs.csv`, refreshed by `/rank`) with every detail of each job |
 | `/rank` | A ranked shortlist: each posting scored on skills, experience, culture, location and career fit, with honest gaps |
 | `/apply <url>` | A fit evaluation, then a tailored CV and cover letter, reviewed by a second agent, compiled, and checked as PDFs |
 | `/outcome` | Result tracking, archived materials, follow-up drafts |
@@ -53,7 +53,7 @@ Then, in the agent:
 /apply https://boards.greenhouse.io/<company>/jobs/<id>
 ```
 
-Companies to search are listed in [config/target_companies.json](config/target_companies.json) (30 are included). Add yours by their ATS token; `bun run .agents/skills/ats-search/cli/src/cli.ts companies --check` confirms every entry resolves. If a page cannot be fetched, paste the posting text instead: `/apply <paste the posting>`.
+Companies to search are listed in [config/target_companies.json](config/target_companies.json) (32 are included). Add yours by their ATS token; `bun run .agents/skills/ats-search/cli/src/cli.ts companies --check` confirms every entry resolves. If a page cannot be fetched, paste the posting text instead: `/apply <paste the posting>`.
 
 ## How `/apply` works
 
@@ -71,6 +71,7 @@ Companies to search are listed in [config/target_companies.json](config/target_c
 |---|---|
 | Greenhouse, Lever, Ashby | Public JSON APIs of the companies you list |
 | Workday | The public JSON endpoint behind each company's careers page (unofficial; it can change) |
+| Amazon, Microsoft | Their own careers-site search endpoints (unofficial; Google, Meta, Apple and Netflix publish none, so find those through LinkedIn) |
 | LinkedIn | Public job listings |
 | freehire | A free tech-jobs aggregator |
 | Anything else | `/add-portal` scaffolds a search skill for another job board |

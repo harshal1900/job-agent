@@ -19,6 +19,10 @@ export function apiBase(ats: Ats, board?: Board): string {
       return "https://api.lever.co"
     case "ashby":
       return "https://api.ashbyhq.com"
+    case "amazon":
+      return "https://www.amazon.jobs"
+    case "microsoft":
+      return "https://apply.careers.microsoft.com"
     case "workday":
       if (!board?.host) throw new CliError("workday board needs a host (wd1, wd5, ...)", "BAD_BOARD")
       return `https://${board.company}.${board.host}.myworkdayjobs.com`
@@ -125,7 +129,19 @@ export function parseJobUrl(raw: string): ParsedId {
     }
     throw fail()
   }
-  throw new CliError(`host ${host} is not a supported ATS (greenhouse, lever, ashby, workday)`, "BAD_ID")
+  if (host === "www.amazon.jobs" || host === "amazon.jobs") {
+    // /<locale>/jobs/<id>/<slug>
+    const at = parts.indexOf("jobs")
+    if (at >= 0 && /^\d+$/.test(parts[at + 1] ?? "")) return { board: validateBoard({ ats: "amazon", company: "amazon" }), jobRef: parts[at + 1] }
+    throw fail()
+  }
+  if (host === "apply.careers.microsoft.com") {
+    // /careers/job/<id>
+    const at = parts.indexOf("job")
+    if (at >= 0 && /^\d+$/.test(parts[at + 1] ?? "")) return { board: validateBoard({ ats: "microsoft", company: "microsoft" }), jobRef: parts[at + 1] }
+    throw fail()
+  }
+  throw new CliError(`host ${host} is not a supported ATS (greenhouse, lever, ashby, workday, amazon, microsoft)`, "BAD_ID")
 }
 
 export function parseIdOrUrl(input: string): ParsedId {

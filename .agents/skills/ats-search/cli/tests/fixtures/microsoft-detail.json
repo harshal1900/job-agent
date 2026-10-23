@@ -1,0 +1,21 @@
+{
+ "status": 200,
+ "data": {
+  "id": 1970393557042145,
+  "displayJobId": "042145",
+  "name": "Principal ML Engineer",
+  "standardizedLocations": [
+   "Redmond, WA, US"
+  ],
+  "locations": [],
+  "postedTs": 1792790598,
+  "department": "Software Engineering",
+  "workLocationOption": "onsite",
+  "positionUrl": "/careers/job/1970393557042145",
+  "jobDescription": "<b>Overview</b><br><p>Build models.</p>",
+  "efcustomTextEmploymentType": [
+   "Full-Time"
+  ],
+  "publicUrl": "https://apply.careers.microsoft.com/careers/job/1970393557042145"
+ }
+}

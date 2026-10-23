@@ -1,4 +1,4 @@
-export const ATS_NAMES = ["greenhouse", "lever", "ashby", "workday"] as const
+export const ATS_NAMES = ["greenhouse", "lever", "ashby", "workday", "amazon", "microsoft"] as const
 export type Ats = (typeof ATS_NAMES)[number]
 
 export type Country = "US" | "CA"

@@ -168,6 +168,16 @@
       "host": "wd1",
       "site": "CorporateCareers",
       "name": "Mastercard"
+    },
+    {
+      "ats": "amazon",
+      "company": "amazon",
+      "name": "Amazon"
+    },
+    {
+      "ats": "microsoft",
+      "company": "microsoft",
+      "name": "Microsoft"
     }
   ]
 }

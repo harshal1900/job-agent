@@ -60,6 +60,22 @@ export function startMock(): Mock {
         return json({ total: offset === 0 ? list.jobPostings.length : 0, jobPostings: postings, facets: fixtureFacets() })
       }
       if (p.startsWith("/workday/wday/cxs/acme/Site/job/")) return json(fixture("workday-detail.json"))
+      if (p === "/amazon/en/search.json") {
+        const q = new URLSearchParams(u.search)
+        const all = fixture("amazon-list.json")
+        const want = q.getAll("country[]")
+        const base = q.get("base_query") ?? ""
+        const jobs = all.jobs.filter((j: any) => (!want.length || want.includes(j.country_code) || !j.country_code) && (!base || /^\d+$/.test(base) ? !base || j.id_icims === base : true))
+        return json({ ...all, jobs })
+      }
+      if (p === "/microsoft/api/pcsx/search") {
+        const all = fixture("microsoft-list.json")
+        const country = new URLSearchParams(u.search).get("location")
+        const keep = all.data.positions.filter((x: any) => !x.standardizedLocations || x.standardizedLocations.some((l: string) => l.endsWith(country === "Canada" ? ", CA" : ", US")))
+        const start = Number(new URLSearchParams(u.search).get("start") ?? 0)
+        return json({ status: 200, data: { count: keep.length, positions: start === 0 ? keep : [] } })
+      }
+      if (p === "/microsoft/api/pcsx/position_details") return json(fixture("microsoft-detail.json"))
       return json({ error: "not found" }, 404)
     },
   })
@@ -111,6 +127,9 @@ export function mockEnv(m: Mock): Record<string, string> {
     ATS_LEVER_URL: `${m.url}/lever`,
     ATS_ASHBY_URL: `${m.url}/ashby`,
     ATS_WORKDAY_URL: `${m.url}/workday`,
+    ATS_AMAZON_URL: `${m.url}/amazon`,
+    ATS_MICROSOFT_URL: `${m.url}/microsoft`,
+    ATS_MICROSOFT_DELAY_MS: "0",
   }
 }
 

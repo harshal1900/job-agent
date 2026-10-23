@@ -1,7 +1,7 @@
 {
   "name": "ats-search-cli",
   "version": "1.0.0",
-  "description": "CLI for searching public Greenhouse, Lever, Ashby and Workday job boards of the companies you watch, filtered to the US and Canada. No authentication, zero runtime dependencies.",
+  "description": "CLI for searching public Greenhouse, Lever, Ashby and Workday job boards, plus Amazon and Microsoft careers, of the companies you watch, filtered to the US and Canada. No authentication, zero runtime dependencies.",
   "type": "module",
   "main": "src/cli.ts",
   "bin": {

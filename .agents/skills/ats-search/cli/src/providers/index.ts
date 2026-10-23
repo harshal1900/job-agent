@@ -1,6 +1,8 @@
 import type { Ats, Board, Job, ListHints, ListResult } from "../types.js"
 import { fetchAshbyDetail, listAshby } from "./ashby.js"
 import { fetchGreenhouseDetail, listGreenhouse } from "./greenhouse.js"
+import { fetchAmazonDetail, listAmazon, probeAmazon } from "./amazon.js"
+import { fetchMicrosoftDetail, listMicrosoft, probeMicrosoft } from "./microsoft.js"
 import { fetchLeverDetail, listLever } from "./lever.js"
 import { fetchWorkdayDetail, listWorkday, probeWorkday } from "./workday.js"
 
@@ -19,5 +21,7 @@ export const PROVIDERS: Record<Ats, Provider> = {
   greenhouse: { list: listGreenhouse, detail: fetchGreenhouseDetail, listHasDescriptions: false, probe: viaList(listGreenhouse) },
   lever: { list: listLever, detail: fetchLeverDetail, listHasDescriptions: true, probe: viaList(listLever) },
   ashby: { list: listAshby, detail: fetchAshbyDetail, listHasDescriptions: true, probe: viaList(listAshby) },
+  amazon: { list: listAmazon, detail: fetchAmazonDetail, listHasDescriptions: true, probe: probeAmazon },
+  microsoft: { list: listMicrosoft, detail: fetchMicrosoftDetail, listHasDescriptions: false, probe: probeMicrosoft },
   workday: { list: listWorkday, detail: fetchWorkdayDetail, listHasDescriptions: false, probe: probeWorkday },
 }

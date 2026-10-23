@@ -1,0 +1,39 @@
+{
+ "status": 200,
+ "data": {
+  "count": 2,
+  "positions": [
+   {
+    "id": 1970393557042145,
+    "displayJobId": "042145",
+    "name": "Principal ML Engineer",
+    "standardizedLocations": [
+     "Redmond, WA, US"
+    ],
+    "locations": [],
+    "postedTs": 1792790598,
+    "department": "Software Engineering",
+    "workLocationOption": "onsite",
+    "positionUrl": "/careers/job/1970393557042145"
+   },
+   {
+    "id": 1970393557042146,
+    "displayJobId": "042146",
+    "name": "Senior Software Engineer",
+    "standardizedLocations": [
+     "Toronto, ON, CA",
+     "Vancouver, BC, CA"
+    ],
+    "locations": [],
+    "postedTs": 1792000000,
+    "department": "Software Engineering",
+    "workLocationOption": "hybrid",
+    "positionUrl": "/careers/job/1970393557042146"
+   },
+   {
+    "id": "x",
+    "name": ""
+   }
+  ]
+ }
+}

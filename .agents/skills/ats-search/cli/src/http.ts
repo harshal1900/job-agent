@@ -32,6 +32,8 @@ export interface RequestOpts {
   body?: unknown
   /** Label used in error messages, e.g. "greenhouse:stripe". */
   label: string
+  /** Extra request headers (a few career sites reject the default client). */
+  headers?: Record<string, string>
 }
 
 /**
@@ -51,6 +53,7 @@ export async function requestJson<T>(url: string, opts: RequestOpts): Promise<T 
         headers: {
           "User-Agent": UA,
           Accept: "application/json",
+          ...opts.headers,
           ...(opts.body !== undefined ? { "Content-Type": "application/json" } : {}),
         },
         body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
