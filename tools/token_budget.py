@@ -32,7 +32,8 @@ def discover() -> list[str]:
 
 
 def size(rel: str) -> int:
-    return (ROOT / rel).stat().st_size
+    # Count line breaks as one byte so a Windows checkout (CRLF) matches the ceilings.
+    return len((ROOT / rel).read_bytes().replace(b"\r\n", b"\n"))
 
 
 def tokens(nbytes: int) -> int:
