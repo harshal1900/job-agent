@@ -49,6 +49,8 @@ jobs:
           python-version: "3.12"
       - run: pip install pyyaml
       - run: python tools/lint_skills.py
+      - name: Agent wrappers in sync with the specs
+        run: python tools/sync_agent_wrappers.py --check
 
   security-guards:
     name: Security guards (permissions, gitignore, manifests)

@@ -1,0 +1,12 @@
+description = "Prepare for an Interview on a Tracked Application"
+prompt = '''
+Run the `interview` workflow of this repository.
+
+Follow the specification below step by step. Wherever it refers to `$ARGUMENTS`, the
+user's input is: {{args}}
+
+If the specification names a Claude Code tool or a subagent you do not have, use the
+mapping in AGENTS.md ("If your agent is not Claude Code").
+
+@{.claude/commands/interview.md}
+'''
