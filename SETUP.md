@@ -176,10 +176,11 @@ cd job-agent
 
 > **Keep your copy private.** `/setup` (section 4) writes your personal data (name, contact details, employment history, salary expectations) into **tracked** files. Never push them to a public repository.
 
-## 3. Install the job-board CLIs
+## 3. Install the Python packages and the job-board CLIs
 Run these from the repository root.
 
 ```bash
+python3 -m pip install -r requirements.txt   # pypdf, openpyxl, PyYAML (a virtual environment is recommended)
 python3 tools/install_portal_clis.py   # Windows: python tools\install_portal_clis.py
 ```
 

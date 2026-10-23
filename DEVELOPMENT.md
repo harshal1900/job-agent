@@ -31,6 +31,7 @@ How to change this repository without breaking it. Day-to-day use is in [AGENTS.
 ## Checks (all run in CI)
 
 ```bash
+python3 -m pip install -r requirements-dev.txt   # once: pypdf, openpyxl, PyYAML, pytest
 python3 -m pytest tests                        # specs, tools and guards
 python3 tools/lint_skills.py                   # skill/command/settings structure
 python3 tools/security_guards.py               # permission allow-list and tool grants

@@ -50,7 +50,7 @@ git clone https://github.com/harshal1900/job-agent.git
 cd job-agent
 git status
 python3 -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
-pip install pytest pypdf
+python3 -m pip install -r requirements-dev.txt
 python3 tools/install_portal_clis.py
 python3 -m pytest -q
 python3 tools/security_guards.py

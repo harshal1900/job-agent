@@ -10,9 +10,13 @@ names files that exist.
 import re
 import subprocess
 import sys
-import tomllib
 import unittest
 from pathlib import Path
+
+try:
+    import tomllib  # Python 3.11+
+except ModuleNotFoundError:  # Python 3.10
+    tomllib = None
 
 REPO = Path(__file__).resolve().parent.parent
 AGENTS = REPO / "AGENTS.md"
@@ -33,6 +37,7 @@ class WrapperTests(unittest.TestCase):
     def test_every_spec_has_exactly_one_wrapper(self):
         self.assertEqual({p.stem for p in WRAPPERS.glob("*.toml")}, spec_names())
 
+    @unittest.skipIf(tomllib is None, "tomllib needs Python 3.11+")
     def test_each_wrapper_is_valid_toml_that_inlines_an_existing_spec(self):
         for path in sorted(WRAPPERS.glob("*.toml")):
             with self.subTest(wrapper=path.name):
