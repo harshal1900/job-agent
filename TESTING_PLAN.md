@@ -8,6 +8,7 @@ The plan is written for a tester called **Riddhi**, a job-seeker in the US and/o
 
 ## How to use this plan
 
+- **Two places to type commands:** a normal terminal (for `python3`, `bun`, `ats`, `git`) and the coding agent's own prompt (for anything starting with `/`, such as `/setup`). Start the agent with `claude` from inside the repository folder; type `/exit` to leave it.
 - Work through the stages in order. Each stage lists **Do**, **Expect** and a **Result** line for you to mark.
 - Mark each check `[x]` on pass. On failure, write the symptom in the **Defect log** at the end (stage, what you typed, what you saw, what you expected) and keep going unless the stage says it blocks the next ones.
 - Judgement checks ("is this score sensible?") matter as much as mechanical ones. The tool is only useful if you would trust its answers.
@@ -110,7 +111,14 @@ python3 tools/extract_cv_text.py "documents/cv/<your-cv>.pdf"
 
 ### 3b. Run the onboarding
 
-Start the agent in the repository and run `/setup`.
+`/setup` is **not** a terminal command. It is a slash command you type **inside your coding agent**, so start the agent first:
+
+1. In a terminal, go to the repository folder: `cd job-agent` (or your clone's folder).
+2. Start the agent from that folder: `claude` (Gemini CLI: `gemini`, Codex: `codex`, Cursor: open the folder and use its agent chat).3. Wait for the agent's prompt. In Claude Code you see a text box at the bottom and a welcome banner.
+4. Type `/setup` there and press Enter. If you typed it in the normal terminal you will get "command not found"; exit and start the agent first.
+
+The same applies to every other slash command in this plan (`/scrape`, `/rank`, `/expand`, `/outcome`, `/interview`, `/upskill`, `/html-report`, `/add-portal`, `/add-template`, `/gmail-sync`, `/notion-sync`, `/reset`). They all run inside the agent. Commands that begin with `python3`, `bun`, `ats`, `git` or `pip` run in the normal terminal.
+
 
 - [ ] It scans `documents/` and lists what it found per folder.
 - [ ] It offers Path A (documents folder), Path B (single CV) and Path C (interview). Choose **Path A**.
