@@ -143,7 +143,7 @@ Result: ____
 
 ### 3d. Alternative paths (repeat in a scratch clone if you want coverage)
 
-- [ ] **Path B:** reset (stage 13), then use `@documents/cv/<file>` with Path B. It extracts and asks follow-up questions.
+- [ ] **Path B:** reset (stage 14a), then use `@documents/cv/<file>` with Path B. It extracts and asks follow-up questions.
 - [ ] **Path C:** reset again, then answer the interview questions. It should feel like a conversation and let you skip optional sections.
 - [ ] **`/setup --section search`:** jumps straight to search configuration without redoing the whole profile.
 - [ ] **Re-run `/setup` Path A** with no new documents. It should propose nothing new (idempotent) and not duplicate content.
