@@ -86,11 +86,26 @@ class ExportJobsCsvTests(unittest.TestCase):
         self.assertEqual(self.run_tool("--keys-file", str(kf))["rows"], 1)
         self.assertEqual(self.rows()[0]["key"], "b-2")
 
-    def test_bom_and_empty_selection_still_write_a_header(self):
-        self.assertEqual(self.run_tool("--keys", "nope")["rows"], 0)
-        raw = self.out.read_bytes()
-        self.assertTrue(raw.startswith(b"\xef\xbb\xbf"))
-        self.assertIn(b"title", raw.splitlines()[0])
+    def test_bom_is_written(self):
+        self.run_tool()
+        self.assertTrue(self.out.read_bytes().startswith(b"\xef\xbb\xbf"))
+
+    def test_empty_selection_writes_nothing_and_explains_why(self):
+        for flags, hint in (
+            (["--keys", "nope"], "0 of 1 listed keys"),
+            (["--min-score", "99"], "1 jobs have a rank score"),
+            (["--status", "applied"], "stored statuses are new, ranked, skipped"),
+            (["--since", "2030-01-01"], "newest job was first seen 2026-10-22"),
+        ):
+            with self.subTest(flags=flags):
+                result = subprocess.run(
+                    [sys.executable, str(TOOL), "--state", str(self.state), "--out", str(self.out), *flags],
+                    capture_output=True, text=True,
+                )
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("nothing written", result.stderr)
+                self.assertIn(hint, result.stderr)
+                self.assertFalse(self.out.exists(), "an empty export must not leave a header-only file")
 
     def test_missing_state_is_a_clear_error(self):
         self.state.unlink()

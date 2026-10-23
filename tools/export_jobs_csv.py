@@ -96,6 +96,26 @@ def select(seen: dict, keys, statuses, since, min_score) -> list[tuple[str, dict
     return rows
 
 
+def explain_empty(seen: dict, keys, args) -> str:
+    """Say why nothing matched, so an empty export is never a silent header-only file."""
+    total = sum(1 for e in seen.values() if isinstance(e, dict))
+    lines = [f"no jobs matched - nothing written ({total} jobs are stored)."]
+    if keys is not None:
+        found = len(keys & set(seen))
+        lines.append(f"  --keys/--keys-file: {found} of {len(keys)} listed keys exist in the stored jobs.")
+    if args.status:
+        have = sorted({str(e.get("status")) for e in seen.values() if isinstance(e, dict)})
+        lines.append(f"  --status {args.status}: stored statuses are {', '.join(have) or 'none'}.")
+    if args.since:
+        newest = max((str(e.get("first_seen") or "") for e in seen.values() if isinstance(e, dict)), default="")
+        lines.append(f"  --since {args.since}: the newest job was first seen {newest or 'never'}.")
+    if args.min_score is not None:
+        ranked = sum(1 for e in seen.values() if isinstance(e, dict) and isinstance(e.get("rank_score"), (int, float)))
+        lines.append(f"  --min-score {args.min_score}: {ranked} jobs have a rank score (run /rank to score them).")
+    lines.append("  Run the command with no filters to export everything.")
+    return "\n".join(lines)
+
+
 def write_csv(rows: list[tuple[str, dict]], out: Path) -> int:
     extras = sorted(
         {
@@ -136,6 +156,8 @@ def main() -> int:
             args.since,
             args.min_score,
         )
+        if not rows:
+            raise ValueError(explain_empty(seen, parse_keys(args), args))
         out = Path(args.out) if args.out else ROOT / "exports" / f"jobs_{date.today().isoformat()}.csv"
         count = write_csv(rows, out)
     except (ValueError, OSError) as exc:

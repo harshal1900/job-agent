@@ -305,7 +305,7 @@ python3 tools/export_jobs_csv.py --keys-file "<temporary file holding the store 
 It writes `exports/jobs_<YYYY-MM-DD>.csv` (gitignored; opens in Excel and Sheets) with one row per
 job: rank score and verdict, fit, status, title, company, location, country, work mode, employment
 type, department, salary, posted date, deadline, first seen, portal, source, link, requirements and
-summary. Tell the user the path and the row count. When the run found no new jobs, skip the export. To
+summary. Tell the user the path and the row count. When the run found no new jobs, skip the export. If the tool exits 1 it prints why nothing matched and writes no file: show that message to the user rather than reporting an empty CSV. To
 export everything ever stored, or a slice, the user can ask for it: `python3 tools/export_jobs_csv.py
 [--since YYYY-MM-DD] [--status new,ranked] [--min-score N]`.
 
