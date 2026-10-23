@@ -1,14 +1,14 @@
 {
   "_comment": "Byte ceilings for prompt files an agent loads. tokens ~ bytes/4. Regenerate deliberately with: python3 tools/token_budget.py --update",
   "files": {
-    "CLAUDE.md": 5000,
-    "AGENTS.md": 6800,
+    "CLAUDE.md": 5300,
+    "AGENTS.md": 6900,
     ".claude/agents/application-reviewer.md": 8600,
     ".claude/agents/posting-fetcher.md": 2800,
     ".claude/agents/posting-scorer.md": 2500,
-    ".claude/commands/add-portal.md": 15300,
+    ".claude/commands/add-portal.md": 15400,
     ".claude/commands/add-template.md": 15300,
-    ".claude/commands/apply.md": 39500,
+    ".claude/commands/apply.md": 39600,
     ".claude/commands/expand.md": 10400,
     ".claude/commands/gmail-sync.md": 17200,
     ".claude/commands/html-report.md": 10200,
@@ -17,22 +17,22 @@
     ".claude/commands/outcome.md": 23100,
     ".claude/commands/rank.md": 25000,
     ".claude/commands/reset.md": 15700,
-    ".claude/commands/setup.md": 29000,
-    ".claude/skills/job-application-assistant/01-candidate-profile.md": 2100,
+    ".claude/commands/setup.md": 30800,
+    ".claude/skills/job-application-assistant/01-candidate-profile.md": 2200,
     ".claude/skills/job-application-assistant/02-behavioral-profile.md": 1700,
     ".claude/skills/job-application-assistant/03-writing-style.md": 7400,
-    ".claude/skills/job-application-assistant/04-job-evaluation.md": 12900,
+    ".claude/skills/job-application-assistant/04-job-evaluation.md": 14500,
     ".claude/skills/job-application-assistant/04b-company-research-and-calls.md": 4300,
-    ".claude/skills/job-application-assistant/05-cv-templates.md": 21000,
+    ".claude/skills/job-application-assistant/05-cv-templates.md": 21600,
     ".claude/skills/job-application-assistant/05b-cv-layout-and-ats.md": 8800,
-    ".claude/skills/job-application-assistant/06-cover-letter-templates.md": 7600,
+    ".claude/skills/job-application-assistant/06-cover-letter-templates.md": 7800,
     ".claude/skills/job-application-assistant/07-interview-prep.md": 4900,
     ".claude/skills/job-application-assistant/08-application-forms.md": 6500,
     ".claude/skills/job-application-assistant/09-web-research.md": 11200,
     ".claude/skills/job-application-assistant/10-verification-checklist.md": 4900,
     ".claude/skills/job-application-assistant/SKILL.md": 6000,
-    ".claude/skills/job-scraper/SKILL.md": 26300,
-    ".claude/skills/job-scraper/search-queries.md": 5400,
+    ".claude/skills/job-scraper/SKILL.md": 26400,
+    ".claude/skills/job-scraper/search-queries.md": 6000,
     ".claude/skills/upskill/SKILL.md": 16100
   },
   "workflows": {
@@ -48,7 +48,7 @@
         ".claude/skills/job-application-assistant/06-cover-letter-templates.md",
         ".claude/skills/job-application-assistant/10-verification-checklist.md"
       ],
-      "max_bytes": 104400
+      "max_bytes": 107200
     },
     "rank": {
       "files": [
@@ -57,7 +57,7 @@
         ".claude/skills/job-application-assistant/04-job-evaluation.md",
         ".claude/skills/job-application-assistant/01-candidate-profile.md"
       ],
-      "max_bytes": 44900
+      "max_bytes": 46800
     },
     "scrape": {
       "files": [
@@ -65,7 +65,7 @@
         ".claude/skills/job-scraper/SKILL.md",
         ".claude/skills/job-scraper/search-queries.md"
       ],
-      "max_bytes": 36700
+      "max_bytes": 37600
     },
     "interview": {
       "files": [
@@ -76,7 +76,7 @@
         ".claude/skills/job-application-assistant/02-behavioral-profile.md",
         ".claude/skills/job-application-assistant/04b-company-research-and-calls.md"
       ],
-      "max_bytes": 29800
+      "max_bytes": 30200
     },
     "setup": {
       "files": [
@@ -90,7 +90,7 @@
         ".claude/skills/job-application-assistant/06-cover-letter-templates.md",
         ".claude/skills/job-application-assistant/07-interview-prep.md"
       ],
-      "max_bytes": 91200
+      "max_bytes": 95800
     }
   }
 }

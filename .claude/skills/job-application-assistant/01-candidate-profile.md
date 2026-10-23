@@ -15,6 +15,7 @@ framework_version: 1.1.1
 - **LinkedIn:** [YOUR_LINKEDIN_URL]
 - **GitHub:** [YOUR_GITHUB_URL]
 - **Status:** [YOUR_EMPLOYMENT_STATUS]
+- **Work authorization:** [YOUR_WORK_AUTHORIZATION]
 - **Constraints:** [YOUR_COMMUTE_OR_LOCATION_CONSTRAINTS]
 
 ### Languages

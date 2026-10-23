@@ -110,7 +110,17 @@ Hold this content in context throughout Path A. Do not re-read.
 
 ### Step A3: Parse Documents
 
-Read each document found in Step A1. Process subfolders in this order: `cv/`, `linkedin/`, `diplomas/`, `references/`, `projects/`, `applications/`.
+Read each document found in Step A1. A `.pdf`, `.md`, `.txt` or `.tex` you can read directly. For a **`.docx`**, extract its text first (it is a ZIP archive, so the Read tool cannot open it):
+
+> **Windows:** run these tools as `python`, not `python3`. A python.org install ships no `python3`, so that name reaches the Microsoft Store alias, which either exits 49 with no output (#669) or starts a separate Store Python without the packages `pip` installed (such as pypdf). `.claude/settings.json` allows both spellings.
+
+```bash
+python3 tools/extract_cv_text.py "documents/cv/<file>.docx"
+```
+
+The text comes back with the header and footer (where contact details usually are) in `[header]`/`[footer]` blocks, headings as `#`, list items as `-`, table rows joined with ` | `, and link targets in brackets. Hidden text and tracked deletions are left out; if stderr reports `hidden_runs_dropped` above 0, tell the user that the document contained hidden text that you ignored. The same tool reads PDFs (use it when the Read tool cannot render a PDF). A legacy `.doc` is not supported: ask the user to save it as `.docx` or PDF.
+
+Process subfolders in this order: `cv/`, `linkedin/`, `diplomas/`, `references/`, `projects/`, `applications/`.
 
 **`cv/` documents:** name, contact (email, phone, LinkedIn, GitHub), education (degree, institution, dates, thesis), work experience (title, company, dates, location, bullets), skills, languages (with any stated proficiency), publications, awards, profile/summary.
 
@@ -244,7 +254,8 @@ Documents cover skills, experience, education, references, and behavioral signal
 - Deal-breakers and must-haves
 - Languages you work in professionally, with proficiency levels (only if not already extracted from `cv/` or `linkedin/` above) - this feeds the Language Gate in `04-job-evaluation.md`, so ask directly rather than skipping it
 - Salary expectations / baseline (optional)
-- Commute or location constraints (if not visible from CV)
+- Work authorization and sponsorship needs (US and/or Canada) - ask directly; it is rarely on a CV
+- Location, remote/hybrid/onsite preference and relocation (if not visible from CV)
 - Job search configuration (use the questions from Path C Section 9 below)
 
 Then proceed to Step 3 to populate the non-skill files (`CLAUDE.md`, `cv/main_example.tex`, `.claude/skills/job-scraper/search-queries.md`). Step 3 will detect that the seven skill files are already populated and skip those substeps.
@@ -274,7 +285,8 @@ Ask about:
 - Phone, email, LinkedIn, GitHub
 - What languages they work in professionally, and roughly what level in each (native, fluent, conversational, a CEFR letter like B2 - whatever's natural for them to describe, doesn't need to be precise). Worth explaining why: a posting requiring a language they don't list at all gets auto-excluded later by the Language Gate, while one asking for a higher level in a language they do list gets flagged for their own judgment instead of silently passed or rejected - so it's worth being honest here rather than optimistic.
 - Current employment status
-- Family/commute constraints (if any)
+- Work authorization: citizenship or visa/permit class for the US and/or Canada, and whether they need employer sponsorship now or later (this feeds the Eligibility Gate in `04-job-evaluation.md`, so ask directly)
+- Location: city and state/province, remote / hybrid / onsite preference, willingness to relocate, and any family constraints
 
 ### Section 2: Education
 For each degree:
@@ -323,7 +335,7 @@ If not, ask behavioral questions:
 - Deal-breakers and must-haves
 - Salary expectations/baseline (optional)
 - What environments to avoid
-- Commute/location constraints
+- Work authorization, remote/hybrid/onsite preference, relocation
 
 ### Section 8: References (optional)
 For each reference:
@@ -337,8 +349,8 @@ Ask about:
 - **Role titles to search for:** Job titles for the same underlying work vary a lot across companies and markets - a "Data Scientist" role at one employer may be called "Insights Analyst" or "Data Consultant" at another. Ask about the function first: "What kind of work do you actually want to be doing day-to-day?" Then translate that into concrete search terms: "Given that, what job titles should I search for? For example: Data Scientist, ML Engineer, Geophysicist." Collect 3-8 specific titles, but keep the underlying function in mind - it feeds the category naming in `search-queries.md` and the Experience Match dimension in `04-job-evaluation.md`.
 - **Key skills as search terms:** "Which of your skills are most likely to appear in job postings?" Pick 3-5 that are distinctive and searchable.
 - **Target companies (optional):** "Are there specific companies you'd like to monitor for openings?"
-- **Geographic scope:** "Which cities or regions should I search in? How far are you willing to commute?" Use this to define the location filter tiers (ideal, acceptable, borderline, too far).
-- **Job portals:** "The framework ships country-agnostic search CLIs (`linkedin-search`, `freehire-search`, enabled by default) plus Danish portal demos (Jobindex, Jobbank, Jobdanmark, Jobnet) that ship **disabled**. `/scrape` auto-discovers whatever portal skills are installed under `.agents/skills/` and skips any with `enabled: false`. Which portals fit your market?" **Then act on the answer:** if the user's market is Denmark (or they ask for the Danish boards), edit each of the four Danish `SKILL.md` files and set `enabled: true` in the frontmatter; otherwise leave them disabled and say so - they cost nothing while disabled and can be enabled later by flipping the flag. If the user needs a local board that is not shipped, guide them to `/add-portal` (market-specific skills live in their fork). WebSearch/`site:` queries remain the fallback for portals without a CLI skill.
+- **Geographic scope:** "Which metro areas, states or provinces should I search, do you want remote roles, and would you relocate?" Use this to define the location filter tiers (ideal: your metro and remote in your country; acceptable: nearby metros; borderline: relocation-only; too far).
+- **Job portals and target companies:** "This workspace searches company career boards on Greenhouse, Lever, Ashby and Workday (`ats-search`, filtered to the US and Canada) plus LinkedIn and freehire. `ats-search` only looks at the companies listed in `config/target_companies.json`, so which companies do you want to watch?" **Then act on the answer:** add each company to that file by its ATS token (see `.agents/skills/ats-search/SKILL.md`, "Finding a company's token") and run `bun run .agents/skills/ats-search/cli/src/cli.ts companies --check` to confirm every board resolves; drop the ones that do not. `/scrape` auto-discovers whatever portal skills are installed under `.agents/skills/` and skips any with `enabled: false`. If the user needs a job board that is not shipped (Indeed, Job Bank Canada, Dice, Wellfound), guide them to `/add-portal`. WebSearch/`site:` queries remain the fallback for boards without a CLI skill.
 - **CV language:** "Should your CVs be written in English (the default, accepted in most markets), or in your market's language?" Record the answer as a `CV language: <language>` line in CLAUDE.md's Identity section. Cover letters always match each posting's language automatically; this setting governs the CV only. If the user is unsure, keep English and note they can re-run `/setup --section search` to change it.
 
 **Important:** Also suggest role types the user may not have considered, based on their skill profile. For example:
@@ -388,7 +400,7 @@ Replace all placeholder tokens in the search queries file with the user's actual
 - Replace `[YOUR_PRIMARY_ROLE_TYPE]`, `[YOUR_PRIMARY_JOB_TITLE]`, etc. with actual role titles
 - Replace `[YOUR_KEY_SKILL]`, `[YOUR_DOMAIN_KEYWORD_1]`, etc. with actual skills and domain terms
 - Replace `[YOUR_CITY]`, `[YOUR_COUNTRY]`, `[YOUR_REGION]` with actual location
-- Fill in the location filter tiers (ideal, acceptable, borderline, too far) based on commute constraints
+- Fill in the location filter tiers (ideal, acceptable, borderline, too far) from the user's metro, remote and relocation answers
 - Organize queries into priority categories matching the user's career direction:
   - Priority 1: Their strongest/most desired role direction
   - Priority 2: Their domain expertise

@@ -25,7 +25,7 @@ the command name.
 
 | Command | Spec | Use it to |
 |---|---|---|
-| `setup` | `.claude/commands/setup.md` | Build the profile from documents, a pasted CV, or an interview |
+| `setup` | `.claude/commands/setup.md` | Build the profile from documents (Word, PDF, Markdown, LaTeX), a pasted CV, or an interview |
 | `scrape` | `.claude/skills/job-scraper/SKILL.md` | Find new postings across the installed portals |
 | `rank` | `.claude/commands/rank.md` | Score scraped postings into a ranked shortlist |
 | `apply <url or text>` | `.claude/commands/apply.md` | Evaluate fit, draft and review a CV and cover letter, compile PDFs |

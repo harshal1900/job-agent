@@ -17,7 +17,7 @@ This repo is a job application workspace. Claude acts as a career advisor and ap
 
 ### Identity
 - **Name:** [YOUR_NAME]
-- **Location:** [YOUR_CITY], [YOUR_COUNTRY] ([YOUR_COMMUTE_CONSTRAINTS])
+- **Location:** [YOUR_CITY], [YOUR_COUNTRY] ([YOUR_COMMUTE_CONSTRAINTS]) <!-- state or province, remote/hybrid/onsite preference, willingness to relocate -->
 - **Languages:**
   | Language | Level |
   |----------|-------|
@@ -30,6 +30,7 @@ This repo is a job application workspace. Claude acts as a career advisor and ap
 - **CV language:** [YOUR_CV_LANGUAGE] <!-- English unless your market expects otherwise; /setup asks -->
 
 - **Status:** [YOUR_EMPLOYMENT_STATUS]
+- **Work authorization:** [YOUR_WORK_AUTHORIZATION] <!-- e.g. US citizen; TN; H-1B; F-1 OPT; Canadian citizen; PR; PGWP - and whether you need sponsorship. /setup asks; the Eligibility Gate in 04-job-evaluation.md reads it. -->
 - **LinkedIn headline:** "[YOUR_LINKEDIN_HEADLINE]"
 
 ### Education

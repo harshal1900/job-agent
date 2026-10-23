@@ -72,6 +72,8 @@ ALLOWED_PERMISSIONS = {
     "Bash(python3 tools/scrape_state.py:*)",
     "Bash(python tools/verify_pdf.py:*)",
     "Bash(python3 tools/verify_pdf.py:*)",
+    "Bash(python tools/extract_cv_text.py:*)",
+    "Bash(python3 tools/extract_cv_text.py:*)",
     "Bash(python tools/verify_layout.py:*)",
     "Bash(python3 tools/verify_layout.py:*)",
     "Bash(pdftotext:*)",

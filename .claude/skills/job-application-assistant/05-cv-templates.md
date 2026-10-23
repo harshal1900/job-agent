@@ -25,7 +25,7 @@ Expected output: `Output written on main_<company>_<role>.pdf (2 pages, ...)`. A
 ## Document Structure
 
 ```latex
-\documentclass[11pt,a4paper,sans]{moderncv}
+\documentclass[11pt,letterpaper,sans]{moderncv}
 \moderncvstyle{banking}
 \moderncvcolor{blue}
 
@@ -86,7 +86,6 @@ Expected output: `Output written on main_<company>_<role>.pdf (2 pages, ...)`. A
 % 4. Professional Experience section
 % 5. Selected Publications (if applicable)
 % 6. Honors and Awards (if applicable)
-% 7. References
 
 \end{document}
 ```
@@ -123,7 +122,7 @@ Two related patterns are fine and should be kept:
 
 ### Section headings must match the CV's language (important)
 
-Section headings such as `\section{Core Competencies}`, `Professional Experience`, `Education`, `Languages`, `Publications`, `Honors and Awards`, `References` (and any others your template defines), plus the `Available upon request.` line under References, are all **literal English text baked into the template** - they do not translate themselves. Whenever the CV language (see `CV language` in the candidate profile) is not English, translate every one of these too, whatever they are, not just the body prose - a CV with a fully localized profile statement and bullets sitting under untouched English section headers reads as sloppy and inconsistent, and it's an easy thing to forget precisely because the prose translation is the obvious, visible part of the job. Worked example for Spanish: `Competencias Clave`, `Experiencia Profesional`, `Educaci\'on`, `Idiomas`, `Publicaciones`, `Distinciones y Premios`, `Referencias`, `Disponibles a solicitud.` The same rule applies for any other target language - check this explicitly during the verification pass.
+Section headings such as `\section{Core Competencies}`, `Professional Experience`, `Education`, `Languages`, `Publications`, `Honors and Awards` (and any others your template defines) are all **literal English text baked into the template** - they do not translate themselves. Whenever the CV language (see `CV language` in the candidate profile) is not English, translate every one of these too, whatever they are, not just the body prose - a CV with a fully localized profile statement and bullets sitting under untouched English section headers reads as sloppy and inconsistent, and it's an easy thing to forget precisely because the prose translation is the obvious, visible part of the job. Worked example for Spanish: `Competencias Clave`, `Experiencia Profesional`, `Educaci\'on`, `Idiomas`, `Publicaciones`, `Distinciones y Premios`. The same rule applies for any other target language - check this explicitly during the verification pass.
 
 ## Section-by-Section Tailoring
 
@@ -214,9 +213,16 @@ Wherever the CV names a verifiable artifact - a public project, a hackathon entr
 - Keep format brief, one line each
 
 ### References
-- List 2-4 references with name, title, company, and contact
-- End with: "More references are available upon request."
-- **Do not attach reference letters** - employers typically contact references directly
+- **Leave References off a US or Canadian CV.** Recruiters expect them only when asked, and a line such as "References available upon request" wastes space the experience section needs. Keep references on a separate sheet and send it on request.
+- Add a References section only if the candidate asks for one or the posting requires it; then list 2-4 with name, title, company and contact.
+- **Do not attach reference letters** - employers contact references directly
+
+### US and Canadian CV conventions
+- No photo, date of birth, marital status, nationality or national ID number. Employers in both countries are discouraged from asking for them, and they invite bias.
+- Letter paper (8.5 x 11 in). The template is already set to it.
+- Dates as `Mon YYYY - Mon YYYY` or `YYYY-YYYY` with an ASCII hyphen (see "Date fields" below).
+- Work authorization is stated only when it helps (for example "Authorized to work in the US and Canada") and never as a visa history.
+- Lead each role with outcomes with numbers (revenue, latency, users, cost), not duties.
 
 ### LaTeX Special Characters (important)
 
@@ -280,7 +286,6 @@ The CV **must** fit on exactly 2 pages when compiled. Use these content limits a
 | Education | 2-3 entries |
 | Publications | 2-3 entries |
 | Awards | 3 entries, single line each |
-| References | "Available upon request." (single line) |
 
 **If in doubt, cut rather than squeeze.** Reducing `\vspace` or geometry scale to force-fit content makes the CV look cramped.
 
@@ -302,7 +307,6 @@ The section order varies by role type:
 4. Education (reverse chronological)
 5. Languages
 6. Publications & Awards
-7. References
 
 **For domain-specific / specialist roles:**
 1. Profile statement / elevator pitch
@@ -310,4 +314,3 @@ The section order varies by role type:
 3. Education (reverse chronological) - credentials are a key qualifier
 4. Professional Experience (reverse chronological)
 5. Publications & Awards
-6. References

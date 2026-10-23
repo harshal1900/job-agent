@@ -27,7 +27,7 @@ from pathlib import Path
 
 DATA_FILE = Path(__file__).parent / "salary_data.json"
 
-# Common Danish <-> anglicized spelling variants
+# Nordic/German letter -> ASCII spelling variants (accents are folded separately)
 SPELLING_VARIANTS = {
     "ø": "o", "æ": "ae", "å": "aa",
     "ö": "o", "ä": "ae", "ü": "u",
@@ -37,6 +37,10 @@ SPELLING_VARIANTS = {
 STRIP_PATTERNS = [
     r"\ba/s\b", r"\baps\b", r"\bi/s\b", r"\bp/s\b", r"\bk/s\b",
     r"\bivs\b", r"\bamba\b", r"\ba\.m\.b\.a\.?\b",
+    # US / Canadian legal forms and country tags ("Acme Inc.", "Acme Canada Ltd.")
+    r"\binc\b\.?", r"\bincorporated\b", r"\bllc\b", r"\bl\.l\.c\.?", r"\bltd\b\.?",
+    r"\bllp\b", r"\bplc\b", r"\bulc\b",
+    r"\bcanada\b", r"\busa\b",
     r"\(vg\)", r"\(.*?\)",  # (VG) and other parentheticals
     r"\bdanmark\b", r"\bdenmark\b", r"\bscandinavia\b", r"\bnordic\b",
     r"\bgroup\b", r"\bholding\b",

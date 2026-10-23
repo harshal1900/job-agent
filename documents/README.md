@@ -8,7 +8,7 @@ This folder holds your actual career documents. The `/setup` command reads every
 
 ```
 documents/
-├── cv/                          # Your CV files (PDF or LaTeX)
+├── cv/                          # Your CV files (Word, PDF, Markdown or LaTeX)
 ├── linkedin/                    # LinkedIn profile export (PDF)
 ├── diplomas/                    # Degree certificates and transcripts
 ├── references/                  # Reference letters
@@ -30,7 +30,7 @@ documents/
 
 Your master CV — the most complete, unedited version of your professional record.
 
-**Supported formats:** `.pdf`, `.tex`
+**Supported formats:** `.docx`, `.pdf`, `.md`, `.txt`, `.tex`
 
 **What `/setup` extracts:**
 - Work experience (titles, companies, dates, bullet points)
@@ -199,7 +199,8 @@ Application folders may also contain **`interview_prep_<stage>.md`** files writt
 | `.tex` | Yes | LaTeX source — structure and content both readable |
 | `.md` | Yes | Plain text |
 | `.txt` | Yes | Plain text |
-| `.docx` | No | Convert to PDF before placing here |
+| `.docx` | Yes | Read with `tools/extract_cv_text.py`: headers, footers, tables, lists and link targets are kept; hidden text is ignored |
+| `.doc` | No | Save as `.docx` or PDF first |
 | `.png` / `.jpg` | No | Scanned documents won't be parsed — use text PDFs |
 
 ---

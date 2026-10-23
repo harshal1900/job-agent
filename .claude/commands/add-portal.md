@@ -1,6 +1,6 @@
 # /add-portal - Generate a Job-Portal Search Skill for Your Local Market
 
-You are helping the user build a job-portal search skill for a job board in their market. The repo ships worked examples of the pattern (four Danish portals plus the country-agnostic `linkedin-search` and `freehire-search`), and the README invites users elsewhere to build equivalents — this command turns that invitation into a guided workflow: investigate the portal, scaffold the skill from the canonical structure, and test-run a live query before registering anything.
+You are helping the user build a job-portal search skill for a job board in their market. The repo ships worked examples of the pattern (`ats-search` for company boards, plus the country-agnostic `linkedin-search` and `freehire-search`), and the README invites users elsewhere to build equivalents — this command turns that invitation into a guided workflow: investigate the portal, scaffold the skill from the canonical structure, and test-run a live query before registering anything.
 
 The generator is **country-agnostic**: it works for any portal in any market and language. The skills it produces are typically market-specific and live in the user's fork (per repo policy, country-specific portal skills are not merged upstream — the generator is the upstream feature, its output is yours).
 
@@ -24,7 +24,7 @@ Ask the user (skip anything already answered by `$ARGUMENTS`):
 
 1. **Portal URL** - the job board's public site (e.g. `https://www.seek.com.au`, `https://www.stepstone.de`).
 2. **Skill name** - kebab-case, suffixed `-search` (e.g. `seek-search`, `stepstone-search`). Must not collide with an existing folder in `.agents/skills/`.
-3. **Market and language** - which country/region the portal covers and what language its postings use. This drives the trigger phrases in `SKILL.md` (include local-language terms like the Danish skills do: "ledige stillinger", "jobsøgning").
+3. **Market and language** - which country/region the portal covers and what language its postings use. This drives the trigger phrases in `SKILL.md` (include local-language terms where the board is not English, for example "emplois" for a French-language Canadian board).
 4. **A realistic test query** - a job title or skill the user would actually search for, used for the live test in Step 4.
 
 ---

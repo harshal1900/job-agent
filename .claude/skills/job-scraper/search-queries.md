@@ -4,7 +4,7 @@
 
 ## Installed portal CLIs (primary for `/scrape`)
 
-`/scrape` discovers every portal skill under `.agents/skills/*/SKILL.md` and runs its CLI first. Shipped country-agnostic CLIs include `linkedin-search` and `freehire-search`; Danish demos and any skill you add with `/add-portal` are included the same way. You do **not** need a matching `site:` line below for those CLIs to run.
+`/scrape` discovers every portal skill under `.agents/skills/*/SKILL.md` and runs its CLI first. The shipped CLIs are `ats-search` (the career boards of the companies in `config/target_companies.json` on Greenhouse, Lever, Ashby and Workday, filtered to the US and Canada), `linkedin-search` and `freehire-search`; any skill you add with `/add-portal` is included the same way. For `ats-search`, pass the role words from the query categories below to `--query` (use `OR` for synonyms) and your metro or `--remote` flags; it does not read the `site:` lines. You do **not** need a matching `site:` line below for those CLIs to run.
 
 The `site:` query templates in this file are the **WebSearch fallback** — for portals without a CLI, company career pages, or when a CLI fails.
 
@@ -12,10 +12,10 @@ The `site:` query templates in this file are the **WebSearch fallback** — for 
 
 ## Search Sites
 
-Primary (your market's job boards - scaffold one with `/add-portal`):
-- **[YOUR_JOB_BOARD]** - your market's largest general job board
+Primary (job boards without a CLI - scaffold one with `/add-portal`, or use as WebSearch fallback):
+- **[YOUR_JOB_BOARD]** - for example Indeed or Glassdoor (US), Job Bank or Indeed Canada (Canada)
 - **linkedin.com/jobs** - LinkedIn job listings (filter: [YOUR_COUNTRY] / [YOUR_CITY]); also covered by `linkedin-search` CLI
-- **[YOUR_INDUSTRY_JOB_BOARD]** - a niche/industry board for your field (optional)
+- **[YOUR_INDUSTRY_JOB_BOARD]** - a niche board for your field, for example Dice or Built In (tech), Wellfound (startups), USAJOBS (US federal) (optional)
 - **[YOUR_ADDITIONAL_JOB_BOARD]** - another major board for your market (optional)
 
 Secondary (company career pages via Google):
@@ -69,11 +69,11 @@ site:[YOUR_JOB_BOARD] "technical consultant" [YOUR_DOMAIN] [YOUR_CITY]
 
 ## Location Filter
 
-When evaluating results, verify the job location is within reasonable commute distance from your home. Define acceptable areas:
-- [YOUR_CITY] and surrounding areas
+When evaluating results, verify the job location fits your scope: your metro, remote roles within your country, and any metros you would relocate to. Define acceptable areas:
+- [YOUR_CITY] and surrounding areas, plus remote roles in [YOUR_COUNTRY]
 - [ACCEPTABLE_AREA_1]
 - [ACCEPTABLE_AREA_2]
-- [BORDERLINE_AREA] (borderline - ~X min by transit)
+- [BORDERLINE_AREA] (borderline - relocation only)
 - [TOO_FAR_AREA] (too far)
 
 ## Language Filter

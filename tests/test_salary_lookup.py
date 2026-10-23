@@ -463,9 +463,18 @@ class NullShapeEndToEndTests(unittest.TestCase):
 class UtilityTests(unittest.TestCase):
     def test_normalize_strips_suffix_and_noise(self):
         self.assertEqual(normalize("Novo Nordisk A/S"), "novonordisk")
+
         self.assertEqual(normalize("Ørsted (VG) Holding"), "ørsted")
         self.assertEqual(normalize("Chr. Hansen, Denmark Division"), "chrhansen")
         self.assertEqual(normalize("Simple Corp ApS"), "simplecorp")
+
+    def test_normalize_strips_us_and_canadian_legal_forms(self):
+        for name in ("Stripe, Inc.", "Stripe Inc", "Stripe Inc.", "Stripe LLC", "Stripe Canada Ltd.", "Stripe USA Incorporated", "Stripe L.L.C."):
+            with self.subTest(name=name):
+                self.assertEqual(normalize(name), "stripe")
+        self.assertEqual(normalize("Lincoln Financial"), "lincolnfinancial")  # "inc" inside a word survives
+        self.assertEqual(normalize("Limited Brands"), "limitedbrands")  # "Limited" is only stripped as Ltd.
+        self.assertEqual(normalize("Plcbank"), "plcbank")
 
     def test_normalize_strips_dotted_amba_suffix_same_as_undotted(self):
         # The dotted form ("A.M.B.A.") must normalize identically to the

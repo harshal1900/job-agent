@@ -8,7 +8,7 @@ The salary lookup tool (`salary_lookup.py`) lets you benchmark company salaries 
 
 ## How it works
 
-The tool reads a `salary_data.json` file in the repo root containing company salary benchmarks. It uses fuzzy matching to find companies by name, handling Danish/Nordic characters, legal suffixes (A/S, ApS), and common spelling variations.
+The tool reads a `salary_data.json` file in the repo root containing company salary benchmarks. It uses fuzzy matching to find companies by name, handling accented characters, legal suffixes (Inc., LLC, Ltd., Corp.), and common spelling variations.
 
 The data format supports any index-based or absolute salary data. For example:
 - Index 100 = median salary, higher is better
@@ -22,7 +22,7 @@ The tool expects `salary_data.json` with this structure:
 ```json
 {
   "metadata": {
-    "source": "My Union Statistics 2025",
+    "source": "Levels.fyi export 2026",
     "index_baseline": 100,
     "index_label": "Index",
     "baseline_description": "Index 100 = median salary for private sector"
@@ -61,7 +61,7 @@ The tool expects `salary_data.json` with this structure:
 
 ### Option A: Create salary_data.json manually
 
-Create the file by hand with data from any source: union statistics, Glassdoor, salary surveys, networking, or personal research.
+Create the file by hand with data from any source: Levels.fyi, Glassdoor, H-1B LCA / Canadian Job Bank wage data, salary surveys, networking, or personal research.
 
 ### Option B: Convert from Excel
 
@@ -90,8 +90,8 @@ Start with an empty template and add companies as you research them:
   "metadata": {
     "source": "Personal research",
     "index_baseline": 0,
-    "index_label": "Monthly salary (DKK)",
-    "baseline_description": "Approximate monthly salary before tax"
+    "index_label": "Annual base salary (USD)",
+    "baseline_description": "Approximate annual base salary before tax"
   },
   "companies": [
     {
@@ -120,5 +120,5 @@ python3 salary_lookup.py --validate      # pre-flight check your salary_data.jso
 
 - The data file (`salary_data.json`) is **excluded from git** (see `.gitignore`). Your salary data may be proprietary or confidential.
 - If the data file is missing, `salary_lookup.py` exits with a helpful error message and the `/apply` workflow skips the salary benchmark step.
-- The fuzzy matcher handles Danish company name variations: legal suffixes, Nordic characters, anglicized spellings, and partial matches.
+- The fuzzy matcher handles company name variations: legal suffixes (Inc., LLC, Ltd.), country tags (Canada, USA), accented characters, and partial matches.
 - `--validate` checks your data file for malformed category values and duplicate company names and prints a report, without performing a lookup.

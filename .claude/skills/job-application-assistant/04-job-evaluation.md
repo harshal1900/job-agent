@@ -8,7 +8,7 @@ framework_version: 1.2.7
 
 ## Eligibility Gate — run before scoring
 
-If the candidate is not a citizen or permanent resident of the country they are applying in, run this first. It is a hard filter, not a scoring dimension, and it is separate from work-permit *timing*: timing asks "can they work the required hours yet?", eligibility asks "are they permitted to hold this job at all?". A candidate can pass timing and still be categorically excluded.
+Read the candidate's **Work authorization** line in `CLAUDE.md` (set by `/setup`). If the candidate is not a citizen or permanent resident of the country they are applying in, run this first. It is a hard filter, not a scoring dimension, and it is separate from work-permit *timing*: timing asks "can they work the required hours yet?", eligibility asks "are they permitted to hold this job at all?". A candidate can pass timing and still be categorically excluded.
 
 Read the posting's eligibility / work rights / "who can apply" section **verbatim** and classify:
 
@@ -16,6 +16,8 @@ Read the posting's eligibility / work rights / "who can apply" section **verbati
 |-----------------|---------|
 | Names a **citizenship or permanent-residency requirement** ("must be a citizen of X", "permanent resident", "PR required", "full working rights" where the employer means citizen/PR) | **FAIL — hard stop.** Do not score, do not draft. Quote the exact wording back to the user. |
 | Requires a **security clearance** at any level | **FAIL** in most countries, since clearance is normally gated on citizenship. Verify the specific scheme rather than assuming. |
+| **"Must be authorized to work in the US/Canada without sponsorship"** (or "no visa sponsorship") and the candidate **needs sponsorship now or later** | **FAIL — hard stop.** If the candidate is authorized without sponsorship today but would need it later (an H-1B transfer, a TN renewal), do not fail it: flag it. |
+| **"US person"**, ITAR/EAR export-controlled work, or a federal contract | **FAIL** unless the candidate is a US citizen or permanent resident. A TN or H-1B holder is not a "US person". |
 | **Explicitly names** the candidate's permit class, or says "international applicants welcome", "visa holders considered", "we sponsor" | **PASS** — verified acceptance. Worth noting as a positive in the application. |
 | **Silent** on citizenship or residency | **PROCEED, but mark unverified.** Check the employer's own careers or international-applicant page before drafting. |
 
@@ -23,6 +25,8 @@ Read the posting's eligibility / work rights / "who can apply" section **verbati
 
 1. **Silence is not permission.** Large graduate programs frequently gate eligibility on their own website rather than in the job ad. Highest-risk categories: professional-services firms, government and defence, banking, telecommunications, and anything touching critical infrastructure.
 2. **A company-wide "we accept international applicants" statement is not role-level permission.** The common pattern is a general welcome followed by a *named list* of the specific programs or service lines it covers. Confirm the **specific posting or stream** appears on that list before drafting.
+
+**US and Canada specifics.** US: TN (Canadian and Mexican citizens), H-1B, F-1 OPT / STEM OPT, O-1 and green card each have different employer burdens - an employer that "does not sponsor" can usually still hire a TN or OPT holder, so classify against the candidate's real class, not the generic word. Canada: Canadian citizens and permanent residents are unrestricted; a PGWP or other open work permit needs no employer sponsorship, a closed (employer-specific) permit or LMIA does; "eligible to work in Canada" usually includes PGWP holders. Security clearances: US Secret/TS require US citizenship; Canada's Reliability Status / Secret generally require citizenship or PR.
 
 **Report an eligibility failure to the user with the quoted source** rather than silently dropping the role. They may know something about their own status that the profile does not record.
 
@@ -32,7 +36,7 @@ A role that fails this gate is not scored and not drafted. Everything below appl
 
 ## Language Gate — run before scoring
 
-This gate checks a posting's language requirements against what the candidate actually speaks. It is not one of the five Scoring Dimensions below - it runs before them, structured the same way as the Eligibility Gate above: read the posting, classify against profile data, and treat a hard mismatch as FAIL before scoring. Its verdict is tracked downstream: `/rank` records the result as `language_gate` (PASS/FAIL/FLAG) with a supporting `language_note`, persists both into `seen_jobs.json`, and treats a FAIL as a shortlist veto; `/scrape` surfaces the flag in its results table and carries a language-override rule for postings whose ad language differs from the role's working language. `/apply`'s language detection (Step 1, which extracts a posting's required language generically) feeds this same check.
+This gate checks a posting's language requirements against what the candidate actually speaks. In Canada the common case is French: a Québec posting, or one saying "bilingual (English/French) required", needs French on the candidate's table; "French an asset" is a nice-to-have, not a fail. It is not one of the five Scoring Dimensions below - it runs before them, structured the same way as the Eligibility Gate above: read the posting, classify against profile data, and treat a hard mismatch as FAIL before scoring. Its verdict is tracked downstream: `/rank` records the result as `language_gate` (PASS/FAIL/FLAG) with a supporting `language_note`, persists both into `seen_jobs.json`, and treats a FAIL as a shortlist veto; `/scrape` surfaces the flag in its results table and carries a language-override rule for postings whose ad language differs from the role's working language. `/apply`'s language detection (Step 1, which extracts a posting's required language generically) feeds this same check.
 
 Read the posting's language requirements as stated for **the role itself** — not the language the ad happens to be written in. A posting written in a language you don't work in, for a role that only needs languages you do work in on the job, passes fine; only an explicit job-condition requirement ("fluent X required," "must communicate with the Y team in Z") triggers this check. For each language the posting requires as a job condition, compare it against your Languages table in CLAUDE.md / `01-candidate-profile.md`:
 
