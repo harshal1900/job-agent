@@ -11,8 +11,7 @@ candidate's own files. A gap is stated honestly, never filled.
 
 ## First run
 
-1. Read the profile: [CLAUDE.md](CLAUDE.md) (identity, targets, deal-breakers, the
-   verification checklist) and `.claude/skills/job-application-assistant/01-candidate-profile.md`.
+1. Read the profile: [CLAUDE.md](CLAUDE.md) (identity, targets, deal-breakers) and `.claude/skills/job-application-assistant/01-candidate-profile.md`.
    If they still contain `[PLACEHOLDER]` tokens, run **setup** first.
 2. Install the portal CLIs once: `python3 tools/install_portal_clis.py` (needs [Bun](https://bun.sh)).
 3. Companies to search live in `config/target_companies.json`; check them with
@@ -54,11 +53,14 @@ Load files on demand; do not read the whole tree.
 | Task | Read |
 |---|---|
 | Judging fit | `04-job-evaluation.md`, `01-candidate-profile.md`, `02-behavioral-profile.md` |
+| Researching the company, or deciding whether to call the employer | `04b-company-research-and-calls.md` |
 | Writing a CV | `05-cv-templates.md`, `01-candidate-profile.md`, the closest `cv/*.tex` |
+| The compiled CV has a layout problem, or the ATS check fails | `05b-cv-layout-and-ats.md` |
 | Writing a cover letter | `06-cover-letter-templates.md`, `03-writing-style.md` |
 | A page will not load (403, login wall) | `09-web-research.md` |
 | An application form | `08-application-forms.md` |
 | Interview prep | `07-interview-prep.md` |
+| Verifying a finished CV or cover letter | `10-verification-checklist.md` |
 
 (All in `.claude/skills/job-application-assistant/`.)
 

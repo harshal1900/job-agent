@@ -1,9 +1,12 @@
 ---
 name: job-application-assistant
 description: >
-  Assists with job applications: evaluating job postings, tailoring CVs, writing cover letters,
-  and preparing for interviews. Triggers on keywords like: job posting, job application, CV,
-  cover letter, resume, interview prep, job fit, career, application, apply, ansøgning, stilling
+  Evaluates a job posting against the candidate's profile, tailors a LaTeX CV and cover
+  letter to it, and prepares interview answers. Use when the user shares a job posting
+  (URL or text) or asks to tailor a CV or resume, write a cover letter, check job fit, or
+  prepare for an interview at a named company. Triggers on: job posting, job description,
+  tailor my CV, tailor my resume, cover letter, job fit, interview prep. Not for general
+  career chat or for searching for jobs (use the scrape skill for that).
 allowed-tools: Read, Glob, Grep, WebFetch, WebSearch, Edit, Write, AskUserQuestion
 framework_version: 1.3.6
 ---
@@ -24,7 +27,7 @@ When the user provides a job posting (URL or text), follow this workflow:
 - Research the company (website, LinkedIn, mission, recent news), per `09-web-research.md`
 - Score the posting against the candidate's profile using the framework in `04-job-evaluation.md`
 - Present the evaluation table and verdict
-- Suggest whether the candidate should call the employer before applying (see `04-job-evaluation.md` for guidance)
+- Suggest whether the candidate should call the employer before applying (see `04b-company-research-and-calls.md` for guidance)
 - Ask the user if they want to proceed with an application
 
 ### Step 2: Tailor CV
@@ -61,7 +64,9 @@ When the user provides a job posting (URL or text), follow this workflow:
 | `02-behavioral-profile.md` | Behavioral assessment, strengths, ideal environments |
 | `03-writing-style.md` | Tone, structure, do's and don'ts |
 | `04-job-evaluation.md` | Scoring framework for job fit |
+| `04b-company-research-and-calls.md` | Company-research cache schema and when to call the employer; load at the research step |
 | `05-cv-templates.md` | LaTeX CV structure and tailoring rules |
+| `05b-cv-layout-and-ats.md` | Load only when the compiled CV has a layout problem, fails the ATS check, or must be cut to two pages |
 | `06-cover-letter-templates.md` | LaTeX cover letter structure and tailoring rules |
 | `07-interview-prep.md` | STAR examples, tough questions, roleplay guidelines |
 | `08-application-forms.md` | Portal free-text fields: self-introduction, project entries, character-limited pitches |

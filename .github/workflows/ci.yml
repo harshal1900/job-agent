@@ -51,6 +51,8 @@ jobs:
       - run: python tools/lint_skills.py
       - name: Agent wrappers in sync with the specs
         run: python tools/sync_agent_wrappers.py --check
+      - name: Prompt files within their token budgets
+        run: python tools/token_budget.py --check
 
   security-guards:
     name: Security guards (permissions, gitignore, manifests)

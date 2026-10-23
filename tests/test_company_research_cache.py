@@ -15,8 +15,9 @@ import unittest
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-EVALUATION = REPO / ".claude" / "skills" / "job-application-assistant" / "04-job-evaluation.md"
+EVALUATION = REPO / ".claude" / "skills" / "job-application-assistant" / "04b-company-research-and-calls.md"
 APPLY = REPO / ".claude" / "commands" / "apply.md"
+REVIEWER = REPO / ".claude" / "agents" / "application-reviewer.md"
 INTERVIEW = REPO / ".claude" / "commands" / "interview.md"
 
 
@@ -31,9 +32,10 @@ def _sections(text: str, marker: str) -> dict[str, str]:
 
 
 def _apply_research_step() -> str:
-    """apply.md's '### 1. Research the Company' subsection, isolated from the
-    other numbered subsections under Step 3."""
-    text = APPLY.read_text(encoding="utf-8")
+    """The '### 1. Research the Company' task of the application-reviewer agent (the
+    review task list lives in its definition, so /apply's Step 3 prompt carries only
+    data), isolated from the other numbered tasks."""
+    text = REVIEWER.read_text(encoding="utf-8")
     sections = _sections(text, "###")
     for heading, body in sections.items():
         if heading.startswith("1. Research the Company"):
@@ -59,7 +61,7 @@ class TestCacheDefinition(unittest.TestCase):
         self.assertIn(
             "Company Research Cache",
             self.sections,
-            "04-job-evaluation.md must define a 'Company Research Cache' section",
+            "04b-company-research-and-calls.md must define a 'Company Research Cache' section",
         )
 
     def test_cache_definition_specifies_location_and_ttl(self):

@@ -21,6 +21,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 SKILL_DIR = REPO / ".claude" / "skills" / "job-application-assistant"
 CV_TEMPLATES = SKILL_DIR / "05-cv-templates.md"
+CV_LAYOUT = SKILL_DIR / "05b-cv-layout-and-ats.md"
 COVER_TEMPLATES = SKILL_DIR / "06-cover-letter-templates.md"
 APPLY = REPO / ".claude" / "commands" / "apply.md"
 EXAMPLE_CV = REPO / "cv" / "main_example.tex"
@@ -134,6 +135,7 @@ class TestAtsExtractionEncoding(unittest.TestCase):
 
     def test_cv_guide_extraction_command_pins_utf8(self):
         self.assert_pdftotext_commands_pin_utf8(CV_TEMPLATES)
+        self.assert_pdftotext_commands_pin_utf8(CV_LAYOUT)
 
 
 class TestPdflatexFontEncodingGuard(unittest.TestCase):

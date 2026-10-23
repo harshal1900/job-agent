@@ -46,6 +46,7 @@ KNOWN_TOOL_SPECS = {
     ".claude/skills/job-scraper/SKILL.md",
     ".claude/skills/job-application-assistant/04-job-evaluation.md",
     ".claude/skills/job-application-assistant/05-cv-templates.md",
+    ".claude/skills/job-application-assistant/05b-cv-layout-and-ats.md",
     ".claude/skills/job-application-assistant/09-web-research.md",
 }
 
