@@ -36,6 +36,6 @@ describe("loadConfig", () => {
   })
   test("the shipped watchlist parses and has every ATS", () => {
     const boards = loadConfig(undefined, true)
-    expect(new Set(boards.map((b) => b.ats))).toEqual(new Set(["greenhouse", "lever", "ashby", "workday"]))
+    expect(new Set(boards.map((b) => b.ats))).toEqual(new Set(["greenhouse", "lever", "ashby", "workday", "amazon", "microsoft"]))
   })
 })
