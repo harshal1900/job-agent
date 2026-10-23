@@ -68,7 +68,7 @@ Create `.agents/skills/<name>/` with:
     │       ├── search.ts
     │       └── detail.ts
     └── tests/
-        └── helpers.ts    # runCLI + parseJSON test utilities (copy from jobindex-search)
+        └── helpers.ts    # runCLI + parseJSON test utilities (copy from freehire-search)
 ```
 
 ### The portal-skill contract (every generated skill MUST honor this)
@@ -76,7 +76,7 @@ Create `.agents/skills/<name>/` with:
 These conventions are what make portal skills interchangeable for `/scrape` and for users reading any skill's docs:
 
 - **Commands:** `search` and `detail <id|url>`.
-- **Search flags:** `--query`/`-q`, `--jobage <days>` (posting age; map to the portal's parameter, note in SKILL.md if unsupported), `--page <n>` (1-indexed), `--limit <n>` (client-side cap), `--format json|table|plain` (default `json`). Add `--location`/`-l` if the portal supports location as a parameter; if it only supports location inside the keyword query, document that in SKILL.md the way `jobindex-search` does ("include the city in `--query`").
+- **Search flags:** `--query`/`-q`, `--jobage <days>` (posting age; map to the portal's parameter, note in SKILL.md if unsupported), `--page <n>` (1-indexed), `--limit <n>` (client-side cap), `--format json|table|plain` (default `json`). Add `--location`/`-l` if the portal supports location as a parameter; if it only supports location inside the keyword query, document that in SKILL.md the way `linkedin-search` does.
 - **JSON output shape:** `{ "meta": { "count": ..., "page": ... }, "results": [...] }` where each result has at least `id`, `title`, `company`, `location`, `date`, `url` (missing values are `null`, never omitted).
 - **Errors:** written to **stderr** as `{ "error": "...", "code": "..." }`, exit code `1`. Never write errors to stdout.
 - **Fetching:** an honest User-Agent that names the tool (`Mozilla/5.0 (compatible; <portal>-cli/1.0)`, the convention every shipped portal CLI follows) - never a full browser impersonation; if the portal refuses that UA, escalation to browser headers goes through the robots.txt gate in `.claude/skills/job-application-assistant/09-web-research.md`, not through the CLI's default. Exponential backoff with jitter on 429/5xx (max ~6 retries), `""`/`null` on 404 rather than a crash.
@@ -90,7 +90,7 @@ These conventions are what make portal skills interchangeable for `/scrape` and 
 - **`SKILL.md` body:** what the skill searches, the personal-use warning if Step 2 found terms restrictions, command reference with flags, 4-6 usage examples using the user's market (real cities, realistic roles), output-format table, and a Notes section recording portal quirks found in Step 2. If Step 2.5 found the portal needs a credential, add a **Setup** section naming the service, the exact environment variable to export, and the fact that every call is billed - stated where the user reads it before running the skill, not after.
 - **`url-reference.md`:** the endpoints, parameters table, and response-structure notes from Step 2 - this is the file a future maintainer needs when the portal changes its markup.
 - **`package.json`:** name `<portal>-cli`, `"type": "module"`, scripts `start`, `test` (`bun test --timeout 30000`), and `typecheck` (`tsc --noEmit`); dev-only dependencies in the zero-dependency default.
-- **`tests/`:** copy `runCLI`/`parseJSON` from `jobindex-search/cli/tests/helpers.ts`, then add a small live smoke-test file: `search` with the test query returns exit code 0 and ≥1 result with non-null `id`/`title`/`url`; a bogus flag or missing required arg exits 1 with a JSON error on stderr.
+- **`tests/`:** copy `runCLI`/`parseJSON` from `freehire-search/cli/tests/helpers.ts`, then add a small live smoke-test file: `search` with the test query returns exit code 0 and ≥1 result with non-null `id`/`title`/`url`; a bogus flag or missing required arg exits 1 with a JSON error on stderr.
 
 ---
 

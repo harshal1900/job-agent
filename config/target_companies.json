@@ -1,0 +1,173 @@
+{
+  "_comment": "Companies searched by .agents/skills/ats-search. Add a board by its ATS token; run 'companies --check' to verify it resolves.",
+  "boards": [
+    {
+      "ats": "greenhouse",
+      "company": "stripe",
+      "name": "Stripe"
+    },
+    {
+      "ats": "greenhouse",
+      "company": "airbnb",
+      "name": "Airbnb"
+    },
+    {
+      "ats": "greenhouse",
+      "company": "cloudflare",
+      "name": "Cloudflare"
+    },
+    {
+      "ats": "greenhouse",
+      "company": "databricks",
+      "name": "Databricks"
+    },
+    {
+      "ats": "greenhouse",
+      "company": "datadog",
+      "name": "Datadog"
+    },
+    {
+      "ats": "greenhouse",
+      "company": "figma",
+      "name": "Figma"
+    },
+    {
+      "ats": "greenhouse",
+      "company": "coinbase",
+      "name": "Coinbase"
+    },
+    {
+      "ats": "greenhouse",
+      "company": "reddit",
+      "name": "Reddit"
+    },
+    {
+      "ats": "greenhouse",
+      "company": "anthropic",
+      "name": "Anthropic"
+    },
+    {
+      "ats": "greenhouse",
+      "company": "gitlab",
+      "name": "GitLab"
+    },
+    {
+      "ats": "greenhouse",
+      "company": "mongodb",
+      "name": "MongoDB"
+    },
+    {
+      "ats": "greenhouse",
+      "company": "okta",
+      "name": "Okta"
+    },
+    {
+      "ats": "lever",
+      "company": "palantir",
+      "name": "Palantir"
+    },
+    {
+      "ats": "lever",
+      "company": "spotify",
+      "name": "Spotify"
+    },
+    {
+      "ats": "lever",
+      "company": "zoox",
+      "name": "Zoox"
+    },
+    {
+      "ats": "ashby",
+      "company": "ramp",
+      "name": "Ramp"
+    },
+    {
+      "ats": "ashby",
+      "company": "notion",
+      "name": "Notion"
+    },
+    {
+      "ats": "ashby",
+      "company": "openai",
+      "name": "OpenAI"
+    },
+    {
+      "ats": "ashby",
+      "company": "linear",
+      "name": "Linear"
+    },
+    {
+      "ats": "ashby",
+      "company": "supabase",
+      "name": "Supabase"
+    },
+    {
+      "ats": "ashby",
+      "company": "cursor",
+      "name": "Cursor"
+    },
+    {
+      "ats": "workday",
+      "company": "nvidia",
+      "host": "wd5",
+      "site": "NVIDIAExternalCareerSite",
+      "name": "NVIDIA"
+    },
+    {
+      "ats": "workday",
+      "company": "adobe",
+      "host": "wd5",
+      "site": "external_experienced",
+      "name": "Adobe"
+    },
+    {
+      "ats": "workday",
+      "company": "salesforce",
+      "host": "wd12",
+      "site": "External_Career_Site",
+      "name": "Salesforce"
+    },
+    {
+      "ats": "workday",
+      "company": "target",
+      "host": "wd5",
+      "site": "targetcareers",
+      "name": "Target"
+    },
+    {
+      "ats": "workday",
+      "company": "intel",
+      "host": "wd1",
+      "site": "External",
+      "name": "Intel"
+    },
+    {
+      "ats": "workday",
+      "company": "workday",
+      "host": "wd5",
+      "site": "Workday",
+      "name": "Workday"
+    },
+    {
+      "ats": "workday",
+      "company": "cisco",
+      "host": "wd5",
+      "site": "Cisco_Careers",
+      "name": "Cisco"
+    },
+    {
+      "ats": "workday",
+      "company": "td",
+      "host": "wd3",
+      "site": "TD_Bank_Careers",
+      "name": "TD Bank"
+    },
+    {
+      "ats": "workday",
+      "company": "mastercard",
+      "host": "wd1",
+      "site": "CorporateCareers",
+      "name": "Mastercard"
+    }
+  ]
+}
