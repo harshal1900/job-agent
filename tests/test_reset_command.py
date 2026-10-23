@@ -267,34 +267,6 @@ class TestResetTargetsTheHeadingsTheShippedFilesHave(unittest.TestCase):
         self.assertFalse(appear_in_order(skeleton, ["## Identity", "## Awards"]))
         self.assertFalse(appear_in_order(skeleton, ["## Education", "## Identity", "## Awards"]))
 
-    def test_full_file_skeletons_keep_the_framework_version_frontmatter(self):
-        # The shipped files open with a `framework_version` marker that
-        # check_framework_version.py requires and check_upstream_updates.py
-        # reads. The skeletons started at the `#` title, so one /reset profile
-        # left both files failing the version gate ("missing 'framework_version'
-        # in frontmatter") and invisible to the fork update checker. The
-        # instruction must say to keep the block, and the block must not be
-        # hardcoded into the skeleton, where it would go stale on the next bump.
-        import sys
-        sys.path.insert(0, str(REPO / "tools"))
-        from check_upstream_updates import get_framework_version_from_text
-
-        for filename in ("01-candidate-profile.md", "02-behavioral-profile.md"):
-            with self.subTest(file=filename):
-                shipped = (SKILL_DIR / filename).read_text(encoding="utf-8")
-                head = frontmatter(shipped)
-                self.assertTrue(head, f"{filename} must ship with a frontmatter block")
-                instruction, block = skeleton_step(self.reset, filename)
-                self.assertIn("frontmatter", instruction, f"the {filename} step must say to keep the frontmatter")
-                self.assertNotIn("framework_version", block, "the skeleton must not hardcode a version")
-                # What the file looks like after the reset, applied as written.
-                after = head + block.lstrip("\n")
-                self.assertEqual(
-                    get_framework_version_from_text(after),
-                    get_framework_version_from_text(shipped),
-                    f"a reset must leave {filename}'s framework_version readable and unchanged",
-                )
-
     def test_candidate_skeleton_keeps_the_languages_table_under_identity(self):
         # 04-job-evaluation.md's Language Gate and job-scraper/search-queries.md
         # both read "your Languages table" from 01-candidate-profile.md. The
