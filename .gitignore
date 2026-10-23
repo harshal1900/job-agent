@@ -119,3 +119,11 @@ company_research/*.json
 
 # Brainstorm mockups (superpowers visual companion) - never ship
 .superpowers/
+
+# Leftovers from the previous project in this working folder (personal data, never commit)
+config/master_profile.json
+database/
+exports/
+api/
+automation/
+reports/
