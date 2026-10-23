@@ -31,7 +31,7 @@
     ".claude/skills/job-application-assistant/09-web-research.md": 11200,
     ".claude/skills/job-application-assistant/10-verification-checklist.md": 4900,
     ".claude/skills/job-application-assistant/SKILL.md": 6000,
-    ".claude/skills/job-scraper/SKILL.md": 27400,
+    ".claude/skills/job-scraper/SKILL.md": 27800,
     ".claude/skills/job-scraper/search-queries.md": 6000,
     ".claude/skills/upskill/SKILL.md": 16100,
     ".claude/commands/cheatsheet.md": 5800
@@ -66,7 +66,7 @@
         ".claude/skills/job-scraper/SKILL.md",
         ".claude/skills/job-scraper/search-queries.md"
       ],
-      "max_bytes": 38400
+      "max_bytes": 38800
     },
     "interview": {
       "files": [
