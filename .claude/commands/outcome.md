@@ -224,9 +224,7 @@ If the update recorded an upcoming or newly scheduled interview stage, also sugg
 
 > "Interview coming up? `/interview <company>` builds a prep pack for that stage from this application's archive - the posting, the documents you submitted, and any feedback recorded from earlier rounds."
 
-If the recorded status is `hired`, congratulate the user warmly first - this is the moment the whole framework exists for. Then add this single line (once; never on re-runs for the same application, and never for any other status):
-
-> "If this framework helped you get there, consider [buying it a coffee](https://ko-fi.com/madslorentzen) - it keeps this free for the next job-seeker out there. ☕"
+If the recorded status is `hired`, congratulate the user warmly first - this is the moment the whole workflow exists for. Say nothing else about it, and never on re-runs for the same application.
 
 ---
 

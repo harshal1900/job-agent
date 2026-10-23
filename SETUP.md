@@ -1,10 +1,14 @@
 # Setup Guide
 
-Step-by-step instructions for getting the AI Job Search framework running.
+Step-by-step instructions for getting job-agent running.
 
 ## 1. Prerequisites
 
-### Claude Code
+### An AI coding agent
+
+[Claude Code](https://docs.anthropic.com/en/docs/claude-code) gets the full experience (slash commands, subagents, skills). Gemini CLI, Codex, Cursor and Copilot work too: they read [AGENTS.md](AGENTS.md), and Gemini CLI also has the same slash commands in `.gemini/commands/`.
+
+For Claude Code:
 
 Install Claude Code (Anthropic's CLI for Claude):
 
@@ -26,7 +30,7 @@ On Windows, `py --version` is often the most reliable check. If your system expo
 
 ### Bun (for job search tools)
 
-The job portal CLIs (four Danish portals plus the country-agnostic `linkedin-search` and `freehire-search` tools) are written in TypeScript and run with Bun.
+The job-board CLIs (`ats-search` for Greenhouse, Lever, Ashby and Workday, plus `linkedin-search` and `freehire-search`) are written in TypeScript and run with Bun.
 
 - macOS/Linux:
 
@@ -163,52 +167,39 @@ The default extractor is **pypdf** (BSD, `pip install pypdf`). Poppler `pdftotex
 
 If a command still uses `pdftotext -layout`, it must pass `-enc UTF-8` as well. If **neither** extractor is available, `/apply` skips the mechanical check with a warning and falls back to a visual keyword review — everything else works normally.
 
-## 2. Fork and clone
+## 2. Clone and keep it private
 
 ```bash
-gh repo fork MadsLorentzen/ai-job-search --clone
-cd ai-job-search
-gh repo set-default <your-github-username>/ai-job-search
+git clone https://github.com/harshal1900/job-agent.git
+cd job-agent
 ```
 
-Or manually: fork on GitHub, then clone your fork.
+> **Keep your copy private.** `/setup` (section 4) writes your personal data (name, contact details, employment history, salary expectations) into **tracked** files. Never push them to a public repository.
 
-> **The `set-default` line is not optional.** `gh repo fork --clone` sets the
-> **upstream** repo as gh's default repository ("The `upstream` remote will be set as
-> the default remote repository" — `gh repo fork --help`), and gh uses the default for
-> **creating issues and PRs**. Without it, any later `gh issue create` run from this
-> clone — by you or by an agent you have asked to track your applications — silently
-> files on the upstream **public** tracker, publishing whatever the issue contains
-> under your GitHub identity, on a repo where you cannot delete it (#389).
-
-> **Before you go further: forks are public.** GitHub cannot make a fork of a public
-> repository private, and `/setup` (section 6) writes your personal data into **tracked**
-> files — pushing those commits to a fork publishes them. If this copy is for your own
-> job search rather than for contributing, prefer a **private repository** with this repo
-> as `upstream`: see section 8, step 1 for the exact commands and why committing your
-> personalization there is still the right move. Everything else in this guide works
-> identically either way.
-
-## 3. Install job search CLI dependencies
+## 3. Install the job-board CLIs
 Run these from the repository root.
 
 ```bash
 python3 tools/install_portal_clis.py   # Windows: python tools\install_portal_clis.py
 ```
 
-It runs `bun install` in every portal CLI under `.agents/skills/*/cli/` - discovered, not listed, so a portal you add with `/add-portal` or copy from another fork is included on a fresh clone. A CLI whose `package.json` declares an install-time lifecycle script is skipped and reported rather than run. `--dry-run` shows what it would install.
+It runs `bun install` in every portal CLI under `.agents/skills/*/cli/` - discovered, not listed, so a portal you add with `/add-portal` is included on a fresh clone. A CLI whose `package.json` declares an install-time lifecycle script is skipped and reported rather than run. `--dry-run` shows what it would install.
 
-For `linkedin-search` and `freehire-search` the install is optional: both have zero runtime dependencies and run with plain `bun`; `bun install` only pulls TypeScript dev types.
+All three CLIs have zero runtime dependencies and run with plain `bun`; `bun install` only pulls TypeScript dev types.
 
-If you're outside Denmark, you can generate an equivalent search skill for your local job board with `/add-portal` — it scaffolds the same CLI structure for any public portal and test-runs a live query before registering. See the "Job search tools" section in the README.
-
-## 4. Run the setup interview
-
-Start Claude Code in the repository:
+`ats-search` only searches the companies in `config/target_companies.json`. Add yours by their ATS token (see `.agents/skills/ats-search/SKILL.md`, "Finding a company's token") and confirm they resolve:
 
 ```bash
-claude
+bun run .agents/skills/ats-search/cli/src/cli.ts companies --check
 ```
+
+For a job board without a CLI (Indeed, Job Bank Canada, Dice, Wellfound), `/add-portal` scaffolds a search skill and test-runs a live query before registering it.
+
+## 4. Run the setup
+
+Start your agent in the repository (`claude`, `gemini`, `codex`, or open it in Cursor).
+
+If you have a CV in Word, put it in `documents/cv/`: `.docx`, `.pdf`, `.md`, `.txt` and `.tex` are all read (`tools/extract_cv_text.py` opens Word files, including headers, footers and tables).
 
 Then run the onboarding:
 
@@ -251,13 +242,13 @@ The `--section search` option is especially useful as your priorities evolve. It
 
 ## 5. Optional: Set up salary benchmarking
 
-If you have salary data (from a union, salary survey, Glassdoor, or personal research):
+If you have salary data (from Levels.fyi, Glassdoor, a salary survey, or personal research):
 
 1. **Option A:** Create `salary_data.json` manually in the repo root (see `tools/README_SALARY_TOOL.md` for the format)
 2. **Option B:** Convert from Excel:
    ```bash
    pip install openpyxl
-   python3 tools/convert_salary_excel.py path/to/salary-data.xlsx --source "My Salary Data 2025"
+   python3 tools/convert_salary_excel.py path/to/salary-data.xlsx --source "Levels.fyi 2026"
    ```
 
 This creates `salary_data.json` which the `/apply` workflow uses for salary benchmarking. If you skip this step, salary lookup is simply omitted.
@@ -267,7 +258,7 @@ This creates `salary_data.json` which the `/apply` workflow uses for salary benc
 Find a job posting you're interested in, then:
 
 ```
-/apply https://jobindex.dk/job/1234567
+/apply https://boards.greenhouse.io/<company>/jobs/<id>
 ```
 
 Or paste the job description directly:
@@ -300,32 +291,6 @@ Set-Location cover_letters; xelatex cover_<company>_<role>.tex; Set-Location ..
 ```
 
 These commands apply to the stock templates (moderncv CV, `cover.cls` cover letter). If you'd rather use your own LaTeX template, run `/add-template` — it captures the template's compile engine, fonts, style rules, and page limit, test-compiles it, and wires it into `/apply`. See the "LaTeX templates" section in the README.
-
-## 8. Pulling upstream updates into your fork
-
-Upstream keeps improving the methodology files your fork has personalized, so plan for updates from day one:
-
-**Prefer releases over raw `master`.** Tagged [releases](../../releases) are vetted checkpoints, each described in [CHANGELOG.md](CHANGELOG.md). Updating to a tag pulls a stable, documented state instead of whatever `master` happens to be mid-review. Fetch tags with `git fetch upstream --tags` and merge a release (for example `git merge v1.0.0`) when you want stability; pull `master` directly only when you specifically want the latest unreleased changes. The steps below apply either way - substitute the release tag for `upstream/master` where you see it.
-
-1. **Commit your personalization - but know where those commits land.** `/setup` edits CLAUDE.md and the profile skill files in place; those edits are *yours*, and committing them is what lets updates merge cleanly. But a GitHub **fork of this repo is public** - forks of public repositories cannot be made private - so anything you commit *and push to a fork* is visible to anyone. If you want your profile in a remote at all, don't push it to a fork: create a **private** repository, push there, and add this repo as the `upstream` remote (`git remote add upstream https://github.com/MadsLorentzen/ai-job-search.git`) to keep receiving updates. Committing locally without pushing is also fine. The genuinely sensitive files (tracker, salary data, `documents/`, application archives) are gitignored and never enter git either way. An uncommitted working tree is the most common reason `git pull` refuses to merge at all (`Your local changes ... would be overwritten`).
-2. **Preview what changed before pulling:**
-   ```bash
-   git remote add upstream https://github.com/MadsLorentzen/ai-job-search.git   # first time only, if you cloned your own fork
-   git fetch upstream    # or origin, if you cloned the template directly
-   python3 tools/check_upstream_updates.py
-   ```
-   It compares the `framework_version` markers in your framework files against upstream and lists exactly which methodology files changed, with the diff command for each.
-
-   Two tools answer two different questions, and it's worth running both:
-   - **`check_upstream_updates.py`** — *which of my personalized files changed?* It reads the `framework_version` stamp on each methodology file, so it flags exactly the customized files a release touched.
-   - **`upstream_triage.py`** — *which upstream commits deserve my attention?* It walks the commits you're behind and sorts them into "worth reviewing" vs "probably skip", dropping anything you've already cherry-picked (matched by `git patch-id`, so ported work falls off with no bookkeeping), commits that only touch files your fork removed, and SHAs you've listed in `.github/upstream-wontport.txt`. It's report-only — it prints ready-to-run `git cherry-pick` lines but never merges, pushes, or opens a PR, because on a fork "applies cleanly" isn't "correct".
-
-     ```bash
-     python3 tools/upstream_triage.py --remote upstream
-     ```
-
-     Forks also inherit a `.github/workflows/upstream-watch.yml` that runs this weekly and writes the result into a single rolling issue (it no-ops on the upstream template itself, and stays disabled on a fork until you enable Actions).
-3. **Merge normally.** `git merge upstream/master` (or `git pull`) three-way-merges upstream's edits around your personalization; because methodology edits rarely touch the lines `/setup` filled in, most updates land cleanly. A conflict in a personalized file is a *feature*, not a failure — it means upstream changed methodology in a section you customized, and the version marker plus its changelog commit tell you why. Resolve by keeping your data and adopting the methodology change around it.
 
 ## Troubleshooting
 

@@ -142,11 +142,11 @@ Remind the user once (first run only): the repo files remain the source of truth
 
 ---
 
-## Adapting to Another Tool (forks)
+## Adapting to Another Tool
 
-The sync contract is tool-agnostic; only the two sections marked *(Notion binding)* are tool-specific. A fork targeting a different destination (Airtable, Google Sheets, Linear, ...) keeps Steps 0, 2, 4, 5, and 6 and every Important Rule unchanged - build the same sync set, upsert on the same `Key`, keep bodies write-once and documents local - and swaps only:
+The sync contract is tool-agnostic; only the two sections marked *(Notion binding)* are tool-specific. A copy of this command targeting a different destination (Airtable, Google Sheets, Linear, ...) keeps Steps 0, 2, 4, 5, and 6 and every Important Rule unchanged - build the same sync set, upsert on the same `Key`, keep bodies write-once and documents local - and swaps only:
 
 - **Step 1** (connection preflight) for the target tool's MCP server or access check, keeping the silently-optional bar: not configured or not authenticable both end in one message and a clean exit
 - **Step 3** (locate/create the database) for the equivalent container in the target tool, using the same property table and a renamed sync-state file
 
-Like the portal skills, tool bindings beyond this Notion reference live in forks, where their maintainers can test them against a live workspace.
+Test any other binding against a live workspace before relying on it.

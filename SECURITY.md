@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-Please report security findings privately via **[GitHub private vulnerability reporting](https://github.com/MadsLorentzen/ai-job-search/security/advisories/new)** rather than a public issue. You will get a response within a few days, credit in the fix unless you prefer otherwise, and public disclosure coordinated with the patch.
+Please report security findings privately via **[GitHub private vulnerability reporting](https://github.com/harshal1900/job-agent/security/advisories/new)** rather than a public issue. You will get a response within a few days, credit in the fix unless you prefer otherwise, and public disclosure coordinated with the patch.
 
 If the private form is unavailable, open a public issue that describes the *class* of problem without a working recipe, and note that you have details to share privately.
 
@@ -20,7 +20,7 @@ Every grant the template ships, where it lives, how long it lasts, and what chec
 
 | Surface | What is granted | Lifetime | Guard |
 |---|---|---|---|
-| `.claude/settings.json` `permissions.allow` | Each shipped portal CLI by exact path, `salary_lookup.py`, the `tools/` scripts (`rank_state`, `job_key`, `verify_pdf`, `verify_layout`, `robots_check`, `fetch_page`), `pdftotext`, and `Skill(job-application-assistant)` | Whole session | Exact allowlist; any addition fails CI unless added to `ALLOWED_PERMISSIONS` in the same PR |
+| `.claude/settings.json` `permissions.allow` | Each shipped portal CLI by exact path, `salary_lookup.py`, the `tools/` scripts (`rank_state`, `job_key`, `scrape_state`, `verify_pdf`, `verify_layout`, `robots_check`, `fetch_page`, `posting_guard`, `extract_cv_text`), `pdftotext`, and `Skill(job-application-assistant)` | Whole session | Exact allowlist; any addition fails CI unless added to `ALLOWED_PERMISSIONS` in the same PR |
 | `.claude/settings.json` `permissions.ask` | Always prompt, even over an allow rule or a skill grant: edits to `settings.json`, `settings.local.json`, any `.claude/skills/*/SKILL.md`, any `.claude/commands/*.md`, `.claude/agents/**`, `.github/**`, `tools/security_guards.py`; and `git push` | Whole session | Each rule is required; removal fails CI |
 | `.claude/settings.json` `permissions.deny` | Blocked in every mode, `bypassPermissions` included: `curl`/`wget` with data, form or upload flags, `scp`, `sftp`, `ssh`, `nc`; reads of `.env`, `.env.*`, `~/.ssh/**`, `~/.aws/**`, `~/.gnupg/**` (Read denies also cover Bash `cat`/`head`/`tail`/`sed`) | Whole session | Each rule is required; removal fails CI |
 | Skill `allowed-tools` (`.claude/skills/*/SKILL.md`) | `job-application-assistant`: Read, Glob, Grep, WebFetch, WebSearch, Edit, Write, AskUserQuestion. `scrape`: the same plus Agent, `bun --version`, `tools/job_key.py`. `upskill`: Read, Write, Glob, Grep, WebFetch, WebSearch. No bare `Bash` anywhere. | The turn that invokes the skill; clears on your next message. Not gated by workspace trust. | Exact allowlist (`ALLOWED_SKILL_TOOLS`); bare tools and wildcards fail CI |
@@ -47,4 +47,4 @@ Instruction-level defenses raise the bar; permission-level defenses bound the da
 ## Scope notes
 
 - Portal CLI skills make live requests only when you run them; CI never does.
-- Community fork skills listed in the [forks index](https://github.com/MadsLorentzen/ai-job-search/discussions/78) are **not** covered by this policy - review the code you copy, as the index itself says.
+- A job-board skill you copy in from anywhere else is **not** covered by this policy - read all of its code first: it runs pre-approved on your machine against your career data.

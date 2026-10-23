@@ -1,11 +1,8 @@
 # CI for the framework itself: LaTeX smoke compiles, skill/command lint,
-# CLI typechecks, and (upstream only) placeholder integrity.
+# CLI typechecks, agent-wrapper sync and prompt-size budgets.
 #
-# Fork-friendly by design: forks personalize CLAUDE.md, the skill files, and
-# cv/main_example.tex via /setup, so the placeholder-integrity job and the
-# exact page-count/content assertions run only on the upstream template repo.
-# Compile success, lint correctness, and an extractable PDF text layer are
-# asserted everywhere.
+# Compile success, lint correctness, page counts and an extractable PDF text layer
+# are asserted on the stock templates.
 #
 # Deliberately NOT here: live smoke tests of the job-portal CLIs. They hit
 # real portals (network-flaky, and the linkedin-search skill is personal-use
@@ -13,8 +10,8 @@
 # CI runs typechecks and the checked-in fixture/mock test suites only; live
 # portal testing stays a local, on-demand step.
 #
-# Security posture: this template ships pre-approved Claude Code permissions
-# and CLI code that every fork user executes, so the security-guards job
+# Security posture: this repository ships pre-approved Claude Code permissions
+# and CLI code that runs on the user's machine, so the security-guards job
 # fails PRs that widen settings.json permissions, weaken the personal-data
 # gitignore rules, or add package lifecycle scripts; dependency-review flags
 # newly introduced vulnerable/malicious dependencies. Honest limit: a PR can

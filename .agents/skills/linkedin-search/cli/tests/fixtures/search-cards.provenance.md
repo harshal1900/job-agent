@@ -1,12 +1,9 @@
 # Offline search cards
 
 `search-cards.json` stores the HTML string for the first two verbatim `<li>` cards from a real
-LinkedIn guest search response captured by **portapulito** through the CLI's
-`htmlFetch` on 2026-07-14 and published in [PR #153](https://github.com/MadsLorentzen/ai-job-search/pull/153).
-That PR was closed as an accidental personalized-fork submission, not merged.
+LinkedIn guest search response captured through the CLI's
+`htmlFetch` on 2026-07-14.
 
-Source: `.agents/skills/linkedin-search/cli/test/__fixtures__/search-list.html`
-at commit `5bc3afb94d19b670ecf09287c20d0c95e5d13ba0`.
 Original response SHA-256: `ff5fb9009f26c8f602b1ac4b018f471e76784300723b22db64d9d19c2b7f557c`.
 Two-card excerpt SHA-256: `1ab95e6ccb38b50d922e4d714ff95bb58219c012489a3a94aca5e0adb7b552fb`.
 
