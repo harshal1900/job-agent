@@ -238,7 +238,12 @@ Result: ____
 - [ ] Run `/scrape` a **second time** right away: it reports no repeated jobs (deduplication).
 - [ ] If one portal fails (for example LinkedIn blocks you), `/scrape` says so and continues with the others.
 - [ ] `job_scraper/seen_jobs.json` exists and `git status` does **not** list it (it is ignored).
-- [ ] It offers a sensible next step (`/rank`).
+- [ ] It writes `exports/jobs_<today>.csv` and tells you the path and row count. `exports/` is ignored by git.
+- [ ] Open the CSV in Excel, Numbers or Google Sheets. Accented characters look right, one job per row, and a spot-check of three rows against their postings matches on title, company, location, salary (where published), posted date and link.
+- [ ] Each row also carries work mode, employment type, department, requirements and a short summary where the posting provided them. Blank cells are acceptable only when the posting did not publish that detail.
+- [ ] No cell is run as a spreadsheet formula (no `#NAME?` or `=` results).
+- [ ] The CSV can be regenerated for everything stored: `python3 tools/export_jobs_csv.py --status new,ranked` (and with `--since YYYY-MM-DD`, `--min-score 60`).
+- [ ] It offers sensible next steps (`/rank`, `/cheatsheet`).
 
 Result: ____
 
@@ -256,6 +261,27 @@ Result: ____
 - [ ] `--limit` and `--top` change how many are scored and shown, and deferred jobs are not lost.
 - [ ] `/rank --all` re-ranks, including jobs ranked before.
 - [ ] Ranked jobs are not offered again by a plain `/rank`.
+
+Result: ____
+
+---
+
+## Stage 7b: `/cheatsheet` (interview questions and answers for the roles found)
+
+**Do**: after `/rank`, run `/cheatsheet`. Then try `/cheatsheet --top 5`, `/cheatsheet --role "<a title word>"` and `/cheatsheet --min-score 60`.
+
+- [ ] It builds the sheet at `exports/interview_cheatsheet_<today>.md` and prints the path, role families, and your biggest gaps. It does not paste the whole sheet into the chat.
+- [ ] It refuses to run, and points you to `/setup`, if your profile still has `[YOUR_...]` placeholders.
+- [ ] The header lists the jobs covered, and the shared skills match what the postings really ask for.
+- [ ] A 60-second pitch, honest logistics answers (work authorization, location, salary) and core questions are in your own words and facts.
+- [ ] Each role family has about eight to ten likely questions with an answer outline and the profile fact that backs it.
+- [ ] **Truth check:** every employer, project, tool, number and credential in the sheet exists in your CV or profile. Anything invented is a defect.
+- [ ] A requirement the postings stress that you do not have is shown as a **gap** with an honest way to answer, not covered with a made-up story.
+- [ ] Technical answer points are correct. Read two or three with a sceptical eye.
+- [ ] There are no claims about a specific company's news or culture (that belongs to `/interview`).
+- [ ] Questions to ask the interviewer are specific to the postings.
+- [ ] `/cheatsheet` with no scraped jobs gives a clear "run /scrape first" message.
+- [ ] `exports/` stays out of `git status`.
 
 Result: ____
 

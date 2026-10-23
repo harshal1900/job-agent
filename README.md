@@ -20,10 +20,11 @@ your CV          watch                          Reviewer critiques, revise
 | Command | What you get |
 |---|---|
 | `/setup` | Your profile, built from a CV (Word, PDF, Markdown or LaTeX), your LinkedIn export, or a short interview |
-| `/scrape` | New postings from Greenhouse, Lever, Ashby and Workday career boards (US and Canada), plus LinkedIn and freehire |
+| `/scrape` | New postings from Greenhouse, Lever, Ashby and Workday career boards (US and Canada), plus LinkedIn and freehire, and a CSV (`exports/jobs_<date>.csv`) with every detail of each job |
 | `/rank` | A ranked shortlist: each posting scored on skills, experience, culture, location and career fit, with honest gaps |
 | `/apply <url>` | A fit evaluation, then a tailored CV and cover letter, reviewed by a second agent, compiled, and checked as PDFs |
 | `/outcome` | Result tracking, archived materials, follow-up drafts |
+| `/cheatsheet` | One interview question-and-answer sheet for the kinds of roles your search found, with answer outlines drawn from your own profile |
 | `/interview` | A stage-specific prep pack and a mock interview |
 | `/upskill` | A skill-gap analysis across the postings you track, with a learning plan |
 | `/gmail-sync`, `/notion-sync`, `/html-report` | Status updates from Gmail, a Notion view, an offline dashboard |

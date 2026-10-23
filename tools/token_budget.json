@@ -31,9 +31,10 @@
     ".claude/skills/job-application-assistant/09-web-research.md": 11200,
     ".claude/skills/job-application-assistant/10-verification-checklist.md": 4900,
     ".claude/skills/job-application-assistant/SKILL.md": 6000,
-    ".claude/skills/job-scraper/SKILL.md": 26400,
+    ".claude/skills/job-scraper/SKILL.md": 27400,
     ".claude/skills/job-scraper/search-queries.md": 6000,
-    ".claude/skills/upskill/SKILL.md": 16100
+    ".claude/skills/upskill/SKILL.md": 16100,
+    ".claude/commands/cheatsheet.md": 5800
   },
   "workflows": {
     "apply (orchestrator, clean path)": {
@@ -65,7 +66,7 @@
         ".claude/skills/job-scraper/SKILL.md",
         ".claude/skills/job-scraper/search-queries.md"
       ],
-      "max_bytes": 37600
+      "max_bytes": 38400
     },
     "interview": {
       "files": [
@@ -91,6 +92,16 @@
         ".claude/skills/job-application-assistant/07-interview-prep.md"
       ],
       "max_bytes": 95800
+    },
+    "cheatsheet": {
+      "files": [
+        "CLAUDE.md",
+        ".claude/commands/cheatsheet.md",
+        ".claude/skills/job-application-assistant/01-candidate-profile.md",
+        ".claude/skills/job-application-assistant/02-behavioral-profile.md",
+        ".claude/skills/job-application-assistant/07-interview-prep.md"
+      ],
+      "max_bytes": 19100
     }
   }
 }

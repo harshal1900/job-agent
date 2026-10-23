@@ -30,6 +30,7 @@ the command name.
 | `rank` | `.claude/commands/rank.md` | Score scraped postings into a ranked shortlist |
 | `apply <url or text>` | `.claude/commands/apply.md` | Evaluate fit, draft and review a CV and cover letter, compile PDFs |
 | `outcome` | `.claude/commands/outcome.md` | Record an application result, archive materials, draft follow-ups |
+| `cheatsheet` | `.claude/commands/cheatsheet.md` | One interview question-and-answer sheet for the roles `scrape` found, built from your profile |
 | `interview` | `.claude/commands/interview.md` | Stage-specific prep pack and mock interview |
 | `upskill` | `.claude/skills/upskill/SKILL.md` | Skill-gap analysis and learning plan |
 | `expand` | `.claude/commands/expand.md` | Enrich the profile from public sources you linked |
