@@ -4,6 +4,6 @@
 #   pypdf     - PDF text extraction (extract_cv_text.py, verify_pdf.py)
 #   openpyxl  - Excel salary data conversion (convert_salary_excel.py)
 #   PyYAML    - skill and command linting (lint_skills.py)
-pypdf>=5,<7
+pypdf>=6.21.1,<7
 openpyxl==3.1.5
 PyYAML>=6.0.3,<7
